@@ -7,7 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { dummyPegawai } from "@/data"
 import type { Pegawai, Pengajuan, Role, Tamu } from "@/types"
-import { Plus, Trash2 } from "lucide-react"
+import { Plus, Trash2, Calendar as CalendarIcon } from "lucide-react"
+import { format } from "date-fns"
+import { id as localeId } from "date-fns/locale"
+import { Calendar } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
 
 interface FormPengajuanProps {
   role: Role;
@@ -19,7 +24,7 @@ interface FormPengajuanProps {
 export function FormPengajuan({ role, currentUser, onSubmit, onCancel }: FormPengajuanProps) {
   const [alamatTujuan, setAlamatTujuan] = useState("")
   const [keperluan, setKeperluan] = useState("")
-  const [tanggalKunjungan, setTanggalKunjungan] = useState("")
+  const [date, setDate] = useState<Date | undefined>(undefined)
   const [waktuKunjungan, setWaktuKunjungan] = useState("")
   
   const [selectedPegawaiId, setSelectedPegawaiId] = useState<string>(currentUser ? currentUser.id.toString() : "")
@@ -55,10 +60,13 @@ export function FormPengajuan({ role, currentUser, onSubmit, onCancel }: FormPen
     e.preventDefault()
     
     if (!penanggungJawab) return alert("Pilih penanggung jawab")
-    if (!alamatTujuan || !keperluan || !tanggalKunjungan || !waktuKunjungan) return alert("Lengkapi data kunjungan")
+    if (!alamatTujuan || !keperluan || !date || !waktuKunjungan) return alert("Lengkapi data kunjungan")
     
     const isValidTamu = daftarTamu.every(t => t.nama && t.alamat && t.no_hp)
     if (!isValidTamu) return alert("Lengkapi data tamu")
+
+    // Format date to YYYY-MM-DD
+    const tanggalKunjungan = format(date, "yyyy-MM-dd")
 
     const newPengajuanList: Pengajuan[] = daftarTamu.map(tamuData => ({
       id: crypto.randomUUID(),
@@ -141,11 +149,48 @@ export function FormPengajuan({ role, currentUser, onSubmit, onCancel }: FormPen
               </div>
               <div className="space-y-2">
                 <Label htmlFor="tanggal">Tanggal Kunjungan</Label>
-                <Input id="tanggal" type="date" value={tanggalKunjungan} onChange={e => setTanggalKunjungan(e.target.value)} required />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {date ? format(date, "PPP", { locale: localeId }) : <span>Pilih tanggal</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={setDate}
+                      initialFocus
+                      locale={localeId}
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="waktu">Waktu Kunjungan</Label>
-                <Input id="waktu" type="time" value={waktuKunjungan} onChange={e => setWaktuKunjungan(e.target.value)} required />
+                <Select value={waktuKunjungan} onValueChange={setWaktuKunjungan} required>
+                  <SelectTrigger id="waktu">
+                    <SelectValue placeholder="Pilih jam..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 16 }, (_, i) => {
+                      const hour = (i + 7).toString().padStart(2, '0')
+                      const time = `${hour}:00`
+                      return (
+                        <SelectItem key={time} value={time}>
+                          {time}
+                        </SelectItem>
+                      )
+                    })}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </section>
