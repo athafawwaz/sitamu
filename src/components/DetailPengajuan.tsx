@@ -121,7 +121,7 @@ export function DetailPengajuan({ pengajuan, role, isOpen, onClose, onCheckIn, o
                       <Input 
                         size={1}
                         className="w-40 h-8 text-sm" 
-                        placeholder="Contoh: B-01"
+                        placeholder="Contoh: 123456"
                         value={badgeInputs[pengajuan.tamu.id] || ""}
                         onChange={(e) => handleBadgeChange(pengajuan.tamu.id, e.target.value)}
                       />
