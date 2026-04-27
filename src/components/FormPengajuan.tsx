@@ -44,6 +44,9 @@ export function FormPengajuan({ role, currentUser, onSubmit, onCancel }: FormPen
 
   const handleTamuChange = (index: number, field: keyof typeof daftarTamu[0], value: string) => {
     const newDaftarTamu = [...daftarTamu]
+    if (field === 'no_hp') {
+      value = value.replace(/[^0-9]/g, '')
+    }
     newDaftarTamu[index][field] = value
     setDaftarTamu(newDaftarTamu)
   }
@@ -169,7 +172,13 @@ export function FormPengajuan({ role, currentUser, onSubmit, onCancel }: FormPen
                   </div>
                   <div className="space-y-2 md:col-span-3">
                     <Label>No. HP</Label>
-                    <Input type="tel" value={tamu.no_hp} onChange={e => handleTamuChange(index, 'no_hp', e.target.value)} required />
+                    <Input 
+                      type="tel" 
+                      inputMode="numeric"
+                      value={tamu.no_hp} 
+                      onChange={e => handleTamuChange(index, 'no_hp', e.target.value)} 
+                      required 
+                    />
                   </div>
                   <div className="md:col-span-1 flex items-end justify-center pb-1">
                     {daftarTamu.length > 1 && (
