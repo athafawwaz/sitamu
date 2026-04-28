@@ -10,6 +10,8 @@ export interface Pegawai {
 
 export type StatusTamu = 'pending_vp' | 'pending_svp' | 'outstanding' | 'checkin' | 'checkout';
 
+export type ViewType = 'dashboard' | 'form' | 'table' | 'master_perkantoran' | 'master_pabrik' | 'approval';
+
 export interface Tamu {
   id: string;
   nama: string;

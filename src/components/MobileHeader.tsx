@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button"
 import { LayoutDashboard, Menu, LogOut } from "lucide-react"
 
+import type { ViewType } from "@/types"
+
 interface MobileHeaderProps {
   currentView: string;
-  setCurrentView: (view: string) => void;
+  setCurrentView: (view: ViewType) => void;
   onLogout: () => void;
 }
 

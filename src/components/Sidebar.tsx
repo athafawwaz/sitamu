@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button"
 import { LayoutDashboard, FileText, CheckSquare, Database, Building, Factory, LogOut } from "lucide-react"
-import type { Pegawai, Role } from "@/types"
+import type { Pegawai, Role, ViewType } from "@/types"
 
 interface SidebarProps {
   user: { role: Role, pegawai?: Pegawai };
   currentView: string;
-  setCurrentView: (view: any) => void;
+  setCurrentView: (view: ViewType) => void;
   onLogout: () => void;
 }
 
