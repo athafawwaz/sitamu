@@ -3,10 +3,11 @@ import { Login } from './components/Login'
 import { FormPengajuan } from './components/FormPengajuan'
 import { TablePengajuan } from './components/TablePengajuan'
 import { DetailPengajuan } from './components/DetailPengajuan'
+import { MasterDataView } from './components/MasterDataView'
 import type { StatusTamu, Role, Pegawai, Pengajuan } from './types'
 import { Button } from './components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from './components/ui/tabs'
-import { LogOut, Plus, LayoutDashboard, FileText, Menu } from 'lucide-react'
+import { LogOut, Plus, LayoutDashboard, FileText, Menu, Database, Building, Factory, CheckSquare } from 'lucide-react'
 import { Toaster } from '@/components/ui/sonner'
 import { toast } from 'sonner'
 import { useAppStore } from './store/useAppStore'
@@ -20,6 +21,8 @@ function App() {
     selectedPengajuan,
     filteredPengajuan,
     rawPengajuanList,
+    masterPerkantoran,
+    masterPabrik,
     setActiveTab,
     setCurrentView,
     setSelectedPengajuanId,
@@ -27,7 +30,10 @@ function App() {
     handleLogout,
     handleAddPengajuan,
     handleCheckIn,
-    handleCheckOut
+    handleCheckOut,
+    handleApprove,
+    addMasterData,
+    removeMasterData
   } = useAppStore()
 
   const onLogin = (role: Role, pegawai?: Pegawai) => {
@@ -53,6 +59,12 @@ function App() {
   const onCheckOut = (pengajuanId: string, tamuId: string) => {
     handleCheckOut(pengajuanId, tamuId)
     toast.success('Tamu berhasil check-out')
+  }
+
+  const onApprove = (pengajuanId: string) => {
+    handleApprove(pengajuanId, user!.role, user!.pegawai!.nama)
+    toast.success('Pengajuan tamu berhasil disetujui')
+    setSelectedPengajuanId(null)
   }
 
   if (!user) {
@@ -89,19 +101,53 @@ function App() {
           >
             <LayoutDashboard className="w-4 h-4 mr-2" /> Dashboard
           </Button>
+          <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mt-4">
+            Pengajuan
+          </div>
           <Button 
             variant={currentView === 'table' || currentView === 'form' ? 'secondary' : 'ghost'} 
-            className="w-full justify-start"
+            className="w-full justify-start pl-8"
             onClick={() => setCurrentView('table')}
           >
-            <FileText className="w-4 h-4 mr-2" /> Pengajuan Tamu
+            <FileText className="w-4 h-4 mr-2" /> Riwayat Pengajuan
           </Button>
+          {(user.role === 'VP' || user.role === 'SVP_Operasi') && (
+            <Button 
+              variant={currentView === 'approval' ? 'secondary' : 'ghost'} 
+              className="w-full justify-start pl-8"
+              onClick={() => setCurrentView('approval')}
+            >
+              <CheckSquare className="w-4 h-4 mr-2" /> Butuh Approve
+            </Button>
+          )}
+
+          {user.role === 'Sekuriti' && (
+            <>
+              <div className="px-3 py-2 mt-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                <div className="flex items-center gap-2"><Database className="w-4 h-4" /> Master Data</div>
+              </div>
+              <Button 
+                variant={currentView === 'master_perkantoran' ? 'secondary' : 'ghost'} 
+                className="w-full justify-start pl-8"
+                onClick={() => setCurrentView('master_perkantoran')}
+              >
+                <Building className="w-4 h-4 mr-2" /> Perkantoran
+              </Button>
+              <Button 
+                variant={currentView === 'master_pabrik' ? 'secondary' : 'ghost'} 
+                className="w-full justify-start pl-8"
+                onClick={() => setCurrentView('master_pabrik')}
+              >
+                <Factory className="w-4 h-4 mr-2" /> Pabrik
+              </Button>
+            </>
+          )}
         </div>
 
         <div className="p-4 border-t">
           <div className="mb-4 px-2">
-            <p className="font-semibold text-sm truncate">{user.role === 'Pegawai' ? user.pegawai?.nama : 'Petugas Sekuriti'}</p>
-            <p className="text-xs text-muted-foreground">{user.role}</p>
+            <p className="font-semibold text-sm truncate">{user.role !== 'Sekuriti' ? user.pegawai?.nama : 'Petugas Sekuriti'}</p>
+            <p className="text-xs text-muted-foreground">{user.role === 'SVP_Operasi' ? 'SVP Operasi' : user.role}</p>
           </div>
           <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10" onClick={onLogout}>
             <LogOut className="w-4 h-4 mr-2" /> Logout
@@ -137,19 +183,25 @@ function App() {
                 pengajuanList={rawPengajuanList} 
                 onNavigateToForm={() => setCurrentView('form')}
                 onNavigateToTable={(tab) => {
-                  if (tab) setActiveTab(tab)
+                  if (tab) setActiveTab(tab as StatusTamu)
                   setCurrentView('table')
                 }}
+                onNavigateToApproval={() => setCurrentView('approval')}
               />
             )}
 
-            {currentView !== 'dashboard' && (
+            {(currentView === 'form' || currentView === 'table' || currentView === 'approval') && (
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
-                  <h2 className="text-2xl font-bold">{currentView === 'form' ? 'Buat Pengajuan Baru' : 'Riwayat Pengajuan'}</h2>
+                  <h2 className="text-2xl font-bold">
+                    {currentView === 'form' ? 'Buat Pengajuan Baru' : 
+                     currentView === 'approval' ? 'Butuh Approve' : 'Riwayat Pengajuan'}
+                  </h2>
                   <p className="text-muted-foreground mt-1 text-sm">
                     {currentView === 'form' 
                       ? 'Isi formulir di bawah ini untuk mendaftarkan tamu Anda.' 
+                      : currentView === 'approval'
+                      ? 'Daftar pengajuan tamu yang membutuhkan persetujuan Anda.'
                       : `Pantau status kunjungan tamu ${user.role === 'Pegawai' ? 'Anda' : 'di lingkungan pabrik'}.`
                     }
                   </p>
@@ -164,7 +216,7 @@ function App() {
                       Batal
                     </Button>
                   )}
-                  {currentView === 'table' && (
+                  {(currentView === 'table' || currentView === 'approval') && (
                     <Button onClick={() => setCurrentView('form')}>
                       <Plus className="w-4 h-4 mr-2" /> Pengajuan Baru
                     </Button>
@@ -178,10 +230,30 @@ function App() {
                 <FormPengajuan 
                   role={user.role} 
                   currentUser={user.pegawai} 
+                  masterPerkantoran={masterPerkantoran}
+                  masterPabrik={masterPabrik}
                   onSubmit={onAddPengajuan} 
                   onCancel={() => setCurrentView('table')} 
                 />
               </div>
+            )}
+
+            {currentView === 'master_perkantoran' && (
+              <MasterDataView 
+                title="Perkantoran"
+                data={masterPerkantoran}
+                onAdd={(v) => addMasterData('perkantoran', v)}
+                onRemove={(v) => removeMasterData('perkantoran', v)}
+              />
+            )}
+
+            {currentView === 'master_pabrik' && (
+              <MasterDataView 
+                title="Pabrik"
+                data={masterPabrik}
+                onAdd={(v) => addMasterData('pabrik', v)}
+                onRemove={(v) => removeMasterData('pabrik', v)}
+              />
             )}
 
             {currentView === 'table' && (
@@ -191,7 +263,10 @@ function App() {
                   onValueChange={(val) => setActiveTab(val as StatusTamu)} 
                   className="w-full"
                 >
-                  <TabsList className="grid w-full max-w-md grid-cols-3">
+                  <TabsList className={`grid w-full max-w-lg ${user.role !== 'Sekuriti' ? 'grid-cols-4' : 'grid-cols-3'}`}>
+                    {user.role !== 'Sekuriti' && (
+                      <TabsTrigger value="pending">Menunggu</TabsTrigger>
+                    )}
                     <TabsTrigger value="outstanding">Outstanding</TabsTrigger>
                     <TabsTrigger value="checkin">Check-In</TabsTrigger>
                     <TabsTrigger value="checkout">Check-Out</TabsTrigger>
@@ -200,6 +275,19 @@ function App() {
 
                 <TablePengajuan 
                   data={filteredPengajuan} 
+                  onDetailClick={setSelectedPengajuanId} 
+                />
+              </div>
+            )}
+
+            {currentView === 'approval' && (
+              <div className="space-y-4 animate-in fade-in duration-500">
+                <TablePengajuan 
+                  data={rawPengajuanList.filter(p => 
+                    user.role === 'VP' 
+                      ? (p.status === 'pending_vp' && p.penanggung_jawab.unit_kerja === user.pegawai?.unit_kerja) 
+                      : p.status === 'pending_svp'
+                  )} 
                   onDetailClick={setSelectedPengajuanId} 
                 />
               </div>
@@ -216,6 +304,7 @@ function App() {
         role={user.role}
         onCheckIn={onCheckIn}
         onCheckOut={onCheckOut}
+        onApprove={onApprove}
       />
       <Toaster theme="dark" richColors position="top-right" />
     </div>

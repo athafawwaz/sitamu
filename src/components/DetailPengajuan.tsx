@@ -15,9 +15,10 @@ interface DetailPengajuanProps {
   onClose: () => void;
   onCheckIn: (pengajuanId: string, tamuId: string, noBadge: string) => void;
   onCheckOut: (pengajuanId: string, tamuId: string) => void;
+  onApprove?: (pengajuanId: string) => void;
 }
 
-export function DetailPengajuan({ pengajuan, role, isOpen, onClose, onCheckIn, onCheckOut }: DetailPengajuanProps) {
+export function DetailPengajuan({ pengajuan, role, isOpen, onClose, onCheckIn, onCheckOut, onApprove }: DetailPengajuanProps) {
   const [badgeInputs, setBadgeInputs] = useState<Record<string, string>>({})
 
   // Reset inputs when pengajuan changes
@@ -48,6 +49,8 @@ export function DetailPengajuan({ pengajuan, role, isOpen, onClose, onCheckIn, o
 
   const getStatusBadge = (status: StatusTamu) => {
     switch (status) {
+      case 'pending_vp': return <Badge variant="outline" className="text-orange-500 border-orange-500">Menunggu Approval VP</Badge>
+      case 'pending_svp': return <Badge variant="outline" className="text-orange-500 border-orange-500">Menunggu Approval SVP</Badge>
       case 'outstanding': return <Badge variant="destructive">Outstanding</Badge>
       case 'checkin': return <Badge variant="default" className="bg-green-600">Check-In</Badge>
       case 'checkout': return <Badge variant="secondary">Check-Out</Badge>
@@ -91,6 +94,22 @@ export function DetailPengajuan({ pengajuan, role, isOpen, onClose, onCheckIn, o
             </div>
           </div>
         </div>
+
+        {pengajuan.approval_history && pengajuan.approval_history.length > 0 && (
+          <div className="space-y-4 mb-4">
+            <h4 className="font-semibold text-sm text-muted-foreground uppercase">Riwayat Approval</h4>
+            <div className="bg-muted/30 p-3 rounded-md text-sm border space-y-2">
+              {pengajuan.approval_history.map((history, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span>
+                    <span className="font-semibold">{history.nama_approver}</span> ({history.role === 'SVP_Operasi' ? 'SVP Operasi' : history.role}) menyetujui pada {formatDate(history.waktu_approval)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="space-y-4">
           <h4 className="font-semibold text-sm text-muted-foreground uppercase">Data Tamu</h4>
@@ -143,14 +162,30 @@ export function DetailPengajuan({ pengajuan, role, isOpen, onClose, onCheckIn, o
                   </div>
                 )}
 
+                {role === 'VP' && pengajuan.tamu.status === 'pending_vp' && (
+                  <Button size="sm" className="mt-2 md:mt-0" onClick={() => onApprove?.(pengajuan.id)}>
+                    <CheckCircle className="w-4 h-4 mr-1"/> Approve Kunjungan
+                  </Button>
+                )}
+
+                {role === 'SVP_Operasi' && pengajuan.tamu.status === 'pending_svp' && (
+                  <Button size="sm" className="mt-2 md:mt-0" onClick={() => onApprove?.(pengajuan.id)}>
+                    <CheckCircle className="w-4 h-4 mr-1"/> Approve Kunjungan
+                  </Button>
+                )}
+
               </div>
           </div>
         </div>
 
         <DialogFooter className="mt-6 flex justify-between items-center sm:justify-between w-full">
-          <Button variant="default" onClick={() => printFormulir(pengajuan)}>
-            <Printer className="w-4 h-4 mr-2" /> Cetak Formulir
-          </Button>
+          <div>
+            {!pengajuan.status.startsWith('pending') && (
+              <Button variant="default" onClick={() => printFormulir(pengajuan)}>
+                <Printer className="w-4 h-4 mr-2" /> Cetak Formulir
+              </Button>
+            )}
+          </div>
           <Button variant="outline" onClick={onClose}>Tutup</Button>
         </DialogFooter>
       </DialogContent>

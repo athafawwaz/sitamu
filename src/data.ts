@@ -1,11 +1,28 @@
 import type { Pegawai, Pengajuan } from './types';
 
 export const dummyPegawai: Pegawai[] = [
-  { id: 1, nama: "Budi Santoso", no_badge: "PSR-001", unit_kerja: "Departemen Produksi" },
-  { id: 2, nama: "Siti Rahayu", no_badge: "PSR-002", unit_kerja: "Departemen HR" },
-  { id: 3, nama: "Ahmad Fauzi", no_badge: "PSR-003", unit_kerja: "Departemen Keuangan" },
-  { id: 4, nama: "Dewi Lestari", no_badge: "PSR-004", unit_kerja: "Departemen IT" },
-  { id: 5, nama: "Rizky Pratama", no_badge: "PSR-005", unit_kerja: "Departemen Keamanan" }
+  { id: 1, nama: "Budi Santoso", no_badge: "PSR-001", unit_kerja: "Departemen Produksi", jabatan: 'Staff' },
+  { id: 2, nama: "Siti Rahayu", no_badge: "PSR-002", unit_kerja: "Departemen HR", jabatan: 'Staff' },
+  { id: 3, nama: "Ahmad Fauzi", no_badge: "PSR-003", unit_kerja: "Departemen Produksi", jabatan: 'VP' },
+  { id: 4, nama: "Dewi Lestari", no_badge: "PSR-004", unit_kerja: "Departemen IT", jabatan: 'Staff' },
+  { id: 5, nama: "Rizky Pratama", no_badge: "PSR-005", unit_kerja: "Departemen Keamanan", jabatan: 'Sekuriti' },
+  { id: 6, nama: "Haryanto", no_badge: "PSR-006", unit_kerja: "Direktorat Operasi", jabatan: 'SVP_Operasi' }
+];
+
+export const masterPerkantoran = [
+  "Gedung Utama",
+  "Gedung HRD",
+  "Gedung Keuangan",
+  "Gedung IT",
+  "Gedung R&D"
+];
+
+export const masterPabrik = [
+  "Pabrik 1A",
+  "Pabrik 1B",
+  "Pabrik 2A",
+  "Pabrik 2B",
+  "Pabrik 3"
 ];
 
 export const initialPengajuan: Pengajuan[] = [
@@ -19,6 +36,7 @@ export const initialPengajuan: Pengajuan[] = [
       status: "outstanding"
     },
     keperluan: "Meeting vendor IT",
+    jenis_tujuan: "Perkantoran",
     alamat_tujuan: "Gedung Utama Lt. 2",
     tanggal_waktu: new Date(new Date().getTime() + 2 * 60 * 60 * 1000).toISOString(),
     penanggung_jawab: dummyPegawai[3],
@@ -37,6 +55,7 @@ export const initialPengajuan: Pengajuan[] = [
       no_badge_pinjaman: "VIS-001"
     },
     keperluan: "Audit Lapangan",
+    jenis_tujuan: "Pabrik",
     alamat_tujuan: "Pabrik 2B",
     tanggal_waktu: new Date(new Date().getTime() - 1 * 60 * 60 * 1000).toISOString(),
     penanggung_jawab: dummyPegawai[0],
@@ -56,6 +75,7 @@ export const initialPengajuan: Pengajuan[] = [
       no_badge_pinjaman: "VIS-002"
     },
     keperluan: "Perbaikan Mesin Fotocopy",
+    jenis_tujuan: "Perkantoran",
     alamat_tujuan: "Departemen HR",
     tanggal_waktu: new Date(new Date().getTime() - 4 * 60 * 60 * 1000).toISOString(),
     penanggung_jawab: dummyPegawai[1],

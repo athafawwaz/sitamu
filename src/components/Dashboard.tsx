@@ -8,10 +8,11 @@ interface DashboardProps {
   pegawai?: Pegawai;
   pengajuanList: Pengajuan[];
   onNavigateToForm: () => void;
-  onNavigateToTable: (tab?: 'outstanding' | 'checkin' | 'checkout') => void;
+  onNavigateToTable: (tab?: 'outstanding' | 'checkin' | 'checkout' | 'pending') => void;
+  onNavigateToApproval?: () => void;
 }
 
-export function Dashboard({ role, pegawai, pengajuanList, onNavigateToForm, onNavigateToTable }: DashboardProps) {
+export function Dashboard({ role, pegawai, pengajuanList, onNavigateToForm, onNavigateToTable, onNavigateToApproval }: DashboardProps) {
   const hour = new Date().getHours()
   let greeting = 'Selamat Malam'
   if (hour < 11) greeting = 'Selamat Pagi'
@@ -25,8 +26,9 @@ export function Dashboard({ role, pegawai, pengajuanList, onNavigateToForm, onNa
     year: 'numeric'
   })
 
-  const userName = role === 'Pegawai' ? pegawai?.nama : 'Petugas Keamanan'
-  const unitKerja = role === 'Pegawai' ? (pegawai?.unit_kerja || 'DEPARTEMEN') : 'DEPARTEMEN KEAMANAN'
+  const isSekuriti = role === 'Sekuriti'
+  const userName = !isSekuriti ? pegawai?.nama : 'Petugas Keamanan'
+  const unitKerja = !isSekuriti ? (pegawai?.unit_kerja || 'DEPARTEMEN') : 'DEPARTEMEN KEAMANAN'
 
   const WelcomeBanner = () => (
     <Card className="bg-card/60 backdrop-blur-xl border border-border/50 shadow-2xl relative overflow-hidden mb-6">
@@ -56,7 +58,7 @@ export function Dashboard({ role, pegawai, pengajuanList, onNavigateToForm, onNa
           </div>
         </div>
 
-        {role === 'Pegawai' && (
+        {!isSekuriti && (
           <div className="flex flex-wrap gap-4">
             <Button size="lg" onClick={onNavigateToForm} className="shadow-lg shadow-primary/20">
               <Plus className="w-5 h-5 mr-2" /> Buat Pengajuan Baru
@@ -70,10 +72,27 @@ export function Dashboard({ role, pegawai, pengajuanList, onNavigateToForm, onNa
     </Card>
   )
 
-  if (role === 'Pegawai') {
+  if (!isSekuriti) {
     return (
       <div className="space-y-6 animate-in fade-in duration-500">
         <WelcomeBanner />
+        
+        {(role === 'VP' || role === 'SVP_Operasi') && (
+          <div>
+            <h2 className="text-xl font-bold mb-4">Tugas Anda</h2>
+            <Card className="bg-card/60 backdrop-blur-xl border border-orange-500/50 shadow-md cursor-pointer hover:bg-orange-500/10 transition-all" onClick={onNavigateToApproval}>
+              <CardContent className="p-6 flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-lg text-orange-500">Butuh Approval</h3>
+                  <p className="text-sm text-muted-foreground mt-1">Cek submenu Pengajuan &gt; Butuh Approve untuk menyetujui pengajuan tamu.</p>
+                </div>
+                <div className="p-3 bg-orange-500/20 rounded-full text-orange-500">
+                  <CheckCircle className="w-6 h-6" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
     )
   }

@@ -22,6 +22,8 @@ export function TablePengajuan({ data, onDetailClick }: TablePengajuanProps) {
   
   const getStatusBadge = (status: StatusTamu) => {
     switch (status) {
+      case 'pending_vp': return <Badge variant="outline" className="text-orange-500 border-orange-500">Menunggu Approval VP</Badge>
+      case 'pending_svp': return <Badge variant="outline" className="text-orange-500 border-orange-500">Menunggu Approval SVP</Badge>
       case 'outstanding': return <Badge variant="destructive">Outstanding</Badge>
       case 'checkin': return <Badge variant="default" className="bg-green-600">Check-In</Badge>
       case 'checkout': return <Badge variant="secondary">Check-Out</Badge>

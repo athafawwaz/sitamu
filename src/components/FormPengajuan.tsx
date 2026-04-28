@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { dummyPegawai } from "@/data"
-import type { Pegawai, Pengajuan, Role, Tamu } from "@/types"
+import type { Pegawai, Pengajuan, Role, Tamu, StatusTamu } from "@/types"
 import { Plus, Trash2, Calendar as CalendarIcon } from "lucide-react"
 import { format } from "date-fns"
 import { id as localeId } from "date-fns/locale"
@@ -17,15 +17,18 @@ import { cn } from "@/lib/utils"
 interface FormPengajuanProps {
   role: Role;
   currentUser?: Pegawai;
+  masterPerkantoran: string[];
+  masterPabrik: string[];
   onSubmit: (pengajuanList: Pengajuan[]) => void;
   onCancel: () => void;
 }
 
-export function FormPengajuan({ role, currentUser, onSubmit, onCancel }: FormPengajuanProps) {
+export function FormPengajuan({ role, currentUser, masterPerkantoran, masterPabrik, onSubmit, onCancel }: FormPengajuanProps) {
   const [alamatTujuan, setAlamatTujuan] = useState("")
   const [keperluan, setKeperluan] = useState("")
   const [date, setDate] = useState<Date | undefined>(undefined)
   const [waktuKunjungan, setWaktuKunjungan] = useState("")
+  const [jenisTujuan, setJenisTujuan] = useState<"Perumahan" | "Perkantoran" | "Pabrik">("Perumahan")
   
   const [selectedPegawaiId, setSelectedPegawaiId] = useState<string>(currentUser ? currentUser.id.toString() : "")
   
@@ -68,19 +71,45 @@ export function FormPengajuan({ role, currentUser, onSubmit, onCancel }: FormPen
     // Format date to YYYY-MM-DD
     const tanggalKunjungan = format(date, "yyyy-MM-dd")
 
+    let initialStatus: StatusTamu = 'outstanding';
+    const initialApprovalHistory: { role: Role, nama_approver: string, waktu_approval: string }[] = [];
+    const currentTime = new Date().toISOString();
+
+    if (jenisTujuan === 'Perkantoran') {
+      if (role === 'VP' || role === 'SVP_Operasi') {
+        initialStatus = 'outstanding';
+        initialApprovalHistory.push({ role, nama_approver: currentUser!.nama, waktu_approval: currentTime });
+      } else {
+        initialStatus = 'pending_vp';
+      }
+    } else if (jenisTujuan === 'Pabrik') {
+      if (role === 'SVP_Operasi') {
+        initialStatus = 'outstanding';
+        initialApprovalHistory.push({ role: 'VP', nama_approver: currentUser!.nama, waktu_approval: currentTime });
+        initialApprovalHistory.push({ role: 'SVP_Operasi', nama_approver: currentUser!.nama, waktu_approval: currentTime });
+      } else if (role === 'VP') {
+        initialStatus = 'pending_svp';
+        initialApprovalHistory.push({ role, nama_approver: currentUser!.nama, waktu_approval: currentTime });
+      } else {
+        initialStatus = 'pending_vp';
+      }
+    }
+
     const newPengajuanList: Pengajuan[] = daftarTamu.map(tamuData => ({
       id: crypto.randomUUID(),
       tanggal_waktu: `${tanggalKunjungan}T${waktuKunjungan}`,
+      jenis_tujuan: jenisTujuan,
       alamat_tujuan: alamatTujuan,
       keperluan: keperluan,
-      status: 'outstanding',
+      status: initialStatus,
       penanggung_jawab: penanggungJawab,
       tamu: {
         id: crypto.randomUUID(),
         ...tamuData,
-        status: 'outstanding'
+        status: initialStatus
       },
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
+      approval_history: initialApprovalHistory.length > 0 ? initialApprovalHistory : undefined
     }))
 
     onSubmit(newPengajuanList)
@@ -140,8 +169,61 @@ export function FormPengajuan({ role, currentUser, onSubmit, onCancel }: FormPen
             <h3 className="text-lg font-semibold border-b pb-2">B. Data Kunjungan</h3>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2 md:col-span-2">
+                <Label>Jenis Tujuan</Label>
+                <div className="flex gap-6 mt-1">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="jenisTujuan" 
+                      value="Perumahan" 
+                      checked={jenisTujuan === 'Perumahan'} 
+                      onChange={() => { setJenisTujuan('Perumahan'); setAlamatTujuan(''); }} 
+                      className="accent-primary w-4 h-4"
+                    />
+                    <span className="text-sm">Perumahan</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="jenisTujuan" 
+                      value="Perkantoran" 
+                      checked={jenisTujuan === 'Perkantoran'} 
+                      onChange={() => { setJenisTujuan('Perkantoran'); setAlamatTujuan(''); }} 
+                      className="accent-primary w-4 h-4"
+                    />
+                    <span className="text-sm">Perkantoran</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="jenisTujuan" 
+                      value="Pabrik" 
+                      checked={jenisTujuan === 'Pabrik'} 
+                      onChange={() => { setJenisTujuan('Pabrik'); setAlamatTujuan(''); }} 
+                      className="accent-primary w-4 h-4"
+                    />
+                    <span className="text-sm">Pabrik</span>
+                  </label>
+                </div>
+              </div>
+              <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="alamat">Alamat Tujuan</Label>
-                <Input id="alamat" placeholder="Contoh: Gedung Utama Lt. 2" value={alamatTujuan} onChange={e => setAlamatTujuan(e.target.value)} required />
+                {jenisTujuan === 'Perumahan' ? (
+                  <Input id="alamat" placeholder="Contoh: Jl. Mawar No. 10" value={alamatTujuan} onChange={e => setAlamatTujuan(e.target.value)} required />
+                ) : (
+                  <Select value={alamatTujuan} onValueChange={setAlamatTujuan} required>
+                    <SelectTrigger id="alamat">
+                      <SelectValue placeholder={`Pilih ${jenisTujuan}...`} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(jenisTujuan === 'Perkantoran' ? masterPerkantoran : masterPabrik).map(tempat => (
+                        <SelectItem key={tempat} value={tempat}>
+                          {tempat}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="keperluan">Keperluan</Label>

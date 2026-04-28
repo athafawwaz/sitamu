@@ -17,20 +17,34 @@ export function Login({ onLogin }: LoginProps) {
         </CardHeader>
         <CardContent className="flex flex-col gap-4 mt-4">
           <Button 
-            className="w-full h-12 text-lg font-medium" 
+            className="w-full h-10 text-md font-medium" 
             onClick={() => onLogin('Pegawai', dummyPegawai[0])}
           >
             Login sebagai Pegawai
           </Button>
           <Button 
+            className="w-full h-10 text-md font-medium" 
+            variant="secondary"
+            onClick={() => onLogin('VP', dummyPegawai[2])}
+          >
+            Login sebagai VP
+          </Button>
+          <Button 
+            className="w-full h-10 text-md font-medium" 
+            variant="secondary"
+            onClick={() => onLogin('SVP_Operasi', dummyPegawai[5])}
+          >
+            Login sebagai SVP Operasi
+          </Button>
+          <Button 
             variant="outline" 
-            className="w-full h-12 text-lg font-medium"
+            className="w-full h-10 text-md font-medium mt-2"
             onClick={() => onLogin('Sekuriti')}
           >
             Login sebagai Sekuriti
           </Button>
-          <p className="text-xs text-center text-muted-foreground mt-4">
-            *Untuk mockup ini, login Pegawai akan menggunakan akun dummy Budi Santoso.
+          <p className="text-xs text-center text-muted-foreground mt-2">
+            *Untuk mockup ini, akun akan menggunakan data dummy masing-masing role.
           </p>
         </CardContent>
       </Card>

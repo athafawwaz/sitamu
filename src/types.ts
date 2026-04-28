@@ -1,13 +1,14 @@
-export type Role = 'Pegawai' | 'Sekuriti';
+export type Role = 'Pegawai' | 'Sekuriti' | 'VP' | 'SVP_Operasi';
 
 export interface Pegawai {
   id: number;
   nama: string;
   no_badge: string;
   unit_kerja: string;
+  jabatan?: string;
 }
 
-export type StatusTamu = 'outstanding' | 'checkin' | 'checkout';
+export type StatusTamu = 'pending_vp' | 'pending_svp' | 'outstanding' | 'checkin' | 'checkout';
 
 export interface Tamu {
   id: string;
@@ -20,13 +21,21 @@ export interface Tamu {
   waktu_checkout?: string;
 }
 
+export interface ApprovalHistory {
+  role: Role;
+  nama_approver: string;
+  waktu_approval: string;
+}
+
 export interface Pengajuan {
   id: string;
   tanggal_waktu: string; // YYYY-MM-DDTHH:mm
+  jenis_tujuan: 'Perumahan' | 'Perkantoran' | 'Pabrik';
   alamat_tujuan: string;
   keperluan: string;
   status: StatusTamu;
   penanggung_jawab: Pegawai;
   tamu: Tamu;
   created_at: string;
+  approval_history?: ApprovalHistory[];
 }
