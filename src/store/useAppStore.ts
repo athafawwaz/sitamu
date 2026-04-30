@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
-import type { Pegawai, Pengajuan, Role, StatusTamu } from '@/types'
-import { initialPengajuan, masterPerkantoran as initialMasterPerkantoran, masterPabrik as initialMasterPabrik } from '@/data'
+import type { Pegawai, Pengajuan, Role, StatusTamu } from './types'
+import { initialPengajuan, masterPerkantoran as initialMasterPerkantoran, masterPabrik as initialMasterPabrik } from './data'
 
 export function useAppStore() {
   const [user, setUser] = useState<{ role: Role, pegawai?: Pegawai } | null>(null)

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import type { Pengajuan, Role, StatusTamu } from "@/types"
+import type { Pengajuan, Role, StatusTamu } from "@/store/types"
 import { CheckCircle, Clock, XCircle, Printer } from "lucide-react"
 import { printFormulir } from "@/lib/print"
 

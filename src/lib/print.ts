@@ -1,4 +1,4 @@
-import type { Pengajuan } from '@/types'
+import type { Pengajuan } from '@/store/types'
 
 export function printFormulir(pengajuan: Pengajuan) {
   const dateStr = new Date(pengajuan.tanggal_waktu).toLocaleString('id-ID', {

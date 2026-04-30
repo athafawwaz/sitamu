@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { dummyPegawai } from "@/data"
-import type { Pegawai, Role } from "@/types"
+import { dummyPegawai } from "@/store/data"
+import type { Pegawai, Role } from "@/store/types"
 
 interface LoginProps {
   onLogin: (role: Role, pegawai?: Pegawai) => void;

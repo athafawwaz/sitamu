@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { LayoutDashboard, Menu, LogOut } from "lucide-react"
 
-import type { ViewType } from "@/types"
+import type { ViewType } from "@/store/types"
 
 interface MobileHeaderProps {
   currentView: string;

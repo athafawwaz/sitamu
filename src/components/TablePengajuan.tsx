@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import type { Pengajuan, StatusTamu } from "@/types"
+import type { Pengajuan, StatusTamu } from "@/store/types"
 import { Eye } from "lucide-react"
 
 interface TablePengajuanProps {

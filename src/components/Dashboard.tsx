@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Plus, Users, Clock, CheckCircle, Sparkles, CalendarDays, Building2 } from "lucide-react"
-import type { Pegawai, Pengajuan, Role } from "@/types"
+import type { Pegawai, Pengajuan, Role } from "@/store/types"
 
 interface DashboardProps {
   role: Role;

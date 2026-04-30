@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { LayoutDashboard, FileText, CheckSquare, Database, Building, Factory, LogOut } from "lucide-react"
-import type { Pegawai, Role, ViewType } from "@/types"
+import type { Pegawai, Role, ViewType } from "@/store/types"
 
 interface SidebarProps {
   user: { role: Role, pegawai?: Pegawai };
@@ -14,7 +14,7 @@ export function Sidebar({ user, currentView, setCurrentView, onLogout }: Sidebar
     <aside className="w-64 bg-card/60 backdrop-blur-2xl border-r border-border/50 hidden md:flex flex-col z-10 relative">
       <div className="h-16 flex items-center px-6 border-b">
         <LayoutDashboard className="w-6 h-6 mr-2 text-primary" />
-        <h1 className="text-lg font-bold tracking-tight text-primary">PGM</h1>
+        <h1 className="text-lg font-bold tracking-tight text-primary">Guest Management</h1>
       </div>
       
       <div className="p-4 flex-1 space-y-2">
