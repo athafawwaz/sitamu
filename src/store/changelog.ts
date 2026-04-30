@@ -1,4 +1,4 @@
-export const APP_VERSION = "1.6.0"
+export const APP_VERSION = "1.6.1"
 
 export interface ChangelogEntry {
   version: string
@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  {
+    version: "1.6.1",
+    date: "2026-04-30",
+    type: "patch",
+    description: "Fix unclickable close button in Changelog Modal"
+  },
   {
     version: "1.6.0",
     date: "2026-04-30",
