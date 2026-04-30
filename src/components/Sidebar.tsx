@@ -1,6 +1,10 @@
 import { Button } from "@/components/ui/button"
-import { LayoutDashboard, FileText, CheckSquare, Database, Building, Factory, LogOut } from "lucide-react"
+import { LayoutDashboard, FileText, CheckSquare, Database, Building, Factory, LogOut, Info } from "lucide-react"
 import type { Pegawai, Role, ViewType } from "@/store/types"
+import { useState } from "react"
+import { APP_VERSION } from "@/store/changelog"
+import { ChangelogModal } from "./ChangelogModal"
+import { Badge } from "@/components/ui/badge"
 
 interface SidebarProps {
   user: { role: Role, pegawai?: Pegawai };
@@ -10,6 +14,8 @@ interface SidebarProps {
 }
 
 export function Sidebar({ user, currentView, setCurrentView, onLogout }: SidebarProps) {
+  const [isChangelogOpen, setIsChangelogOpen] = useState(false)
+
   return (
     <aside className="w-64 bg-card/60 backdrop-blur-2xl border-r border-border/50 hidden md:flex flex-col z-10 relative">
       <div className="h-16 flex items-center px-6 border-b">
@@ -81,7 +87,23 @@ export function Sidebar({ user, currentView, setCurrentView, onLogout }: Sidebar
         <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10" onClick={onLogout}>
           <LogOut className="w-4 h-4 mr-2" /> Logout
         </Button>
+
+        <div className="mt-4 pt-4 border-t border-border/50 flex items-center justify-between px-2">
+          <div className="flex flex-col">
+            <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-tighter">Versi Aplikasi</span>
+            <div 
+              className="flex items-center gap-1.5 cursor-pointer group"
+              onClick={() => setIsChangelogOpen(true)}
+            >
+              <Badge variant="secondary" className="text-[10px] px-1.5 h-4 font-mono group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                v{APP_VERSION}
+              </Badge>
+              <Info className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors" />
+            </div>
+          </div>
+        </div>
       </div>
+      <ChangelogModal isOpen={isChangelogOpen} onClose={() => setIsChangelogOpen(false)} />
     </aside>
   )
 }
