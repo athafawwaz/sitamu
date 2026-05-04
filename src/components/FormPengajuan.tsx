@@ -32,8 +32,8 @@ export function FormPengajuan({ role, currentUser, masterPerkantoran, masterPabr
   
   const [selectedPegawaiId, setSelectedPegawaiId] = useState<string>(currentUser ? currentUser.id.toString() : "")
   
-  const [daftarTamu, setDaftarTamu] = useState<Omit<Tamu, 'id' | 'status'>[]>([
-    { nama: "", alamat: "", no_hp: "" }
+  const [daftarTamu, setDaftarTamu] = useState<(Omit<Tamu, 'id' | 'status'> & { no_badge_pinjaman?: string })[]>([
+    { nama: "", alamat: "", no_hp: "", no_badge_pinjaman: "" }
   ])
 
   const penanggungJawab = role === 'Pegawai' 
@@ -41,7 +41,7 @@ export function FormPengajuan({ role, currentUser, masterPerkantoran, masterPabr
     : dummyPegawai.find(p => p.id.toString() === selectedPegawaiId)
 
   const handleAddTamu = () => {
-    setDaftarTamu([...daftarTamu, { nama: "", alamat: "", no_hp: "" }])
+    setDaftarTamu([...daftarTamu, { nama: "", alamat: "", no_hp: "", no_badge_pinjaman: "" }])
   }
 
   const handleRemoveTamu = (index: number) => {
@@ -93,6 +93,14 @@ export function FormPengajuan({ role, currentUser, masterPerkantoran, masterPabr
       } else {
         initialStatus = 'pending_vp';
       }
+    } else if (jenisTujuan === 'Perumahan') {
+      if (role === 'Sekuriti') {
+        const isBadgeComplete = daftarTamu.every(t => t.no_badge_pinjaman && t.no_badge_pinjaman.trim() !== "");
+        if (!isBadgeComplete) return alert("Lengkapi nomor badge pinjaman untuk semua tamu");
+        initialStatus = 'checkin';
+      } else {
+        initialStatus = 'outstanding';
+      }
     }
 
     const newPengajuanList: Pengajuan[] = daftarTamu.map(tamuData => ({
@@ -106,7 +114,8 @@ export function FormPengajuan({ role, currentUser, masterPerkantoran, masterPabr
       tamu: {
         id: crypto.randomUUID(),
         ...tamuData,
-        status: initialStatus
+        status: initialStatus,
+        waktu_checkin: initialStatus === 'checkin' ? currentTime : undefined
       },
       created_at: new Date().toISOString(),
       approval_history: initialApprovalHistory.length > 0 ? initialApprovalHistory : undefined
@@ -307,6 +316,17 @@ export function FormPengajuan({ role, currentUser, masterPerkantoran, masterPabr
                       required 
                     />
                   </div>
+                  {role === 'Sekuriti' && jenisTujuan === 'Perumahan' && (
+                    <div className="space-y-2 md:col-span-12">
+                      <Label>No. Badge Pinjaman</Label>
+                      <Input 
+                        value={tamu.no_badge_pinjaman || ''} 
+                        onChange={e => handleTamuChange(index, 'no_badge_pinjaman', e.target.value)} 
+                        placeholder="Masukkan nomor badge..."
+                        required 
+                      />
+                    </div>
+                  )}
                   <div className="md:col-span-1 flex items-end justify-center pb-1">
                     {daftarTamu.length > 1 && (
                       <Button type="button" variant="destructive" size="icon" onClick={() => handleRemoveTamu(index)}>
@@ -322,7 +342,9 @@ export function FormPengajuan({ role, currentUser, masterPerkantoran, masterPabr
         </CardContent>
         <CardFooter className="flex justify-between border-t p-6 bg-muted/20">
           <Button type="button" variant="ghost" onClick={onCancel}>Batal</Button>
-          <Button type="submit" className="px-8">Ajukan Kunjungan</Button>
+          <Button type="submit" className="px-8">
+            {role === 'Sekuriti' && jenisTujuan === 'Perumahan' ? 'Check-in' : 'Ajukan Kunjungan'}
+          </Button>
         </CardFooter>
       </form>
     </Card>
