@@ -30,7 +30,7 @@ export function FormPengajuan({ role, currentUser, masterPerkantoran, masterPabr
   const [waktuKunjungan, setWaktuKunjungan] = useState("")
   const [jenisTujuan, setJenisTujuan] = useState<"Perumahan" | "Perkantoran" | "Pabrik">("Perumahan")
   
-  const [selectedPegawaiId, setSelectedPegawaiId] = useState<string>(currentUser ? currentUser.id.toString() : "")
+  const [selectedPegawaiId, setSelectedPegawaiId] = useState<string>(role === 'Sekuriti' ? "" : (currentUser ? currentUser.id.toString() : ""))
   
   const [daftarTamu, setDaftarTamu] = useState<(Omit<Tamu, 'id' | 'status'> & { no_badge_pinjaman?: string })[]>([
     { nama: "", alamat: "", no_hp: "", no_badge_pinjaman: "" }
