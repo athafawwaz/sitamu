@@ -1,4 +1,4 @@
-export const APP_VERSION = "1.6.1"
+export const APP_VERSION = "1.7.0"
 
 export interface ChangelogEntry {
   version: string
@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  {
+    version: "1.7.0",
+    date: "2026-05-04",
+    type: "minor",
+    description: "Add minimize/collapse sidebar feature with floating toggle button"
+  },
   {
     version: "1.6.1",
     date: "2026-04-30",
