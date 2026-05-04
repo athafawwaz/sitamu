@@ -68,7 +68,7 @@ export function DetailPengajuan({ pengajuan, role, isOpen, onClose, onCheckIn, o
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[95vw] max-w-3xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Detail Pengajuan Tamu</DialogTitle>
           <DialogDescription>
@@ -178,7 +178,7 @@ export function DetailPengajuan({ pengajuan, role, isOpen, onClose, onCheckIn, o
           </div>
         </div>
 
-        <DialogFooter className="mt-6 flex justify-between items-center sm:justify-between w-full">
+        <DialogFooter className="mt-6 flex flex-col-reverse sm:flex-row sm:justify-between gap-2 w-full">
           <div>
             {!pengajuan.status.startsWith('pending') && (
               <Button variant="default" onClick={() => printFormulir(pengajuan)}>

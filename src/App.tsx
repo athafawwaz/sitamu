@@ -100,11 +100,12 @@ function App() {
         <MobileHeader 
           currentView={currentView} 
           setCurrentView={setCurrentView} 
-          onLogout={onLogout} 
+          onLogout={onLogout}
+          user={user}
         />
 
         {/* Scrollable Content Area */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">
+        <main className="flex-1 overflow-y-auto p-4 pb-20 md:pb-8 md:p-8">
           <div className="max-w-6xl mx-auto">
             {currentView === 'dashboard' && (
               <Dashboard 
@@ -193,13 +194,13 @@ function App() {
                   onValueChange={(val) => setActiveTab(val as StatusTamu)} 
                   className="w-full"
                 >
-                  <TabsList className={`grid w-full max-w-lg ${user.role !== 'Sekuriti' ? 'grid-cols-4' : 'grid-cols-3'}`}>
+                  <TabsList className={`flex overflow-x-auto w-full max-w-lg md:grid ${user.role !== 'Sekuriti' ? 'md:grid-cols-4' : 'md:grid-cols-3'}`}>
                     {user.role !== 'Sekuriti' && (
-                      <TabsTrigger value="pending">Menunggu</TabsTrigger>
+                      <TabsTrigger value="pending" className="shrink-0">Menunggu</TabsTrigger>
                     )}
-                    <TabsTrigger value="outstanding">Outstanding</TabsTrigger>
-                    <TabsTrigger value="checkin">Check-In</TabsTrigger>
-                    <TabsTrigger value="checkout">Check-Out</TabsTrigger>
+                    <TabsTrigger value="outstanding" className="shrink-0">Outstanding</TabsTrigger>
+                    <TabsTrigger value="checkin" className="shrink-0">Check-In</TabsTrigger>
+                    <TabsTrigger value="checkout" className="shrink-0">Check-Out</TabsTrigger>
                   </TabsList>
                 </Tabs>
 

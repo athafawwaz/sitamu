@@ -303,7 +303,7 @@ export function FormPengajuan({ role, currentUser, masterPerkantoran, masterPabr
                     <Input value={tamu.nama} onChange={e => handleTamuChange(index, 'nama', e.target.value)} required />
                   </div>
                   <div className="space-y-2 md:col-span-5">
-                    <Label>Alamat</Label>
+                    <Label>Alamat / Instansi</Label>
                     <Input value={tamu.alamat} onChange={e => handleTamuChange(index, 'alamat', e.target.value)} required />
                   </div>
                   <div className="space-y-2 md:col-span-3">
