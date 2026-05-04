@@ -1,4 +1,4 @@
-export const APP_VERSION = "1.9.0"
+export const APP_VERSION = "1.10.0"
 
 export interface ChangelogEntry {
   version: string
@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  {
+    version: "1.10.0",
+    date: "2026-05-04",
+    type: "minor",
+    description: "Implement auto-timestamp for Sekuriti Perumahan flow and redesign Data Tamu layout"
+  },
   {
     version: "1.9.0",
     date: "2026-05-04",

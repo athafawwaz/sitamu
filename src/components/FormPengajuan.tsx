@@ -59,21 +59,26 @@ export function FormPengajuan({ role, currentUser, masterPerkantoran, masterPabr
     setDaftarTamu(newDaftarTamu)
   }
 
+  const isSeкuritiPerumahan = role === 'Sekuriti' && jenisTujuan === 'Perumahan'
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!penanggungJawab) return alert("Pilih penanggung jawab")
-    if (!alamatTujuan || !keperluan || !date || !waktuKunjungan) return alert("Lengkapi data kunjungan")
+    if (!alamatTujuan || !keperluan) return alert("Lengkapi data kunjungan")
+    if (!isSeкuritiPerumahan && (!date || !waktuKunjungan)) return alert("Lengkapi tanggal dan waktu kunjungan")
     
     const isValidTamu = daftarTamu.every(t => t.nama && t.alamat && t.no_hp)
     if (!isValidTamu) return alert("Lengkapi data tamu")
 
-    // Format date to YYYY-MM-DD
-    const tanggalKunjungan = format(date, "yyyy-MM-dd")
+    const currentTime = new Date().toISOString();
+    // For Sekuriti+Perumahan: tanggal_waktu = exact moment of check-in click
+    const tanggalWaktu = isSeкuritiPerumahan
+      ? currentTime
+      : `${format(date!, 'yyyy-MM-dd')}T${waktuKunjungan}`
 
     let initialStatus: StatusTamu = 'outstanding';
     const initialApprovalHistory: { role: Role, nama_approver: string, waktu_approval: string }[] = [];
-    const currentTime = new Date().toISOString();
 
     if (jenisTujuan === 'Perkantoran') {
       if (role === 'VP' || role === 'SVP_Operasi') {
@@ -105,7 +110,7 @@ export function FormPengajuan({ role, currentUser, masterPerkantoran, masterPabr
 
     const newPengajuanList: Pengajuan[] = daftarTamu.map(tamuData => ({
       id: crypto.randomUUID(),
-      tanggal_waktu: `${tanggalKunjungan}T${waktuKunjungan}`,
+      tanggal_waktu: tanggalWaktu,
       jenis_tujuan: jenisTujuan,
       alamat_tujuan: alamatTujuan,
       keperluan: keperluan,
@@ -238,51 +243,55 @@ export function FormPengajuan({ role, currentUser, masterPerkantoran, masterPabr
                 <Label htmlFor="keperluan">Keperluan</Label>
                 <Textarea id="keperluan" placeholder="Deskripsi keperluan kunjungan" value={keperluan} onChange={e => setKeperluan(e.target.value)} required />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="tanggal">Tanggal Kunjungan</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !date && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date ? format(date, "PPP", { locale: localeId }) : <span>Pilih tanggal</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={setDate}
-                      initialFocus
-                      locale={localeId}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="waktu">Waktu Kunjungan</Label>
-                <Select value={waktuKunjungan} onValueChange={setWaktuKunjungan} required>
-                  <SelectTrigger id="waktu">
-                    <SelectValue placeholder="Pilih jam..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Array.from({ length: 16 }, (_, i) => {
-                      const hour = (i + 7).toString().padStart(2, '0')
-                      const time = `${hour}:00`
-                      return (
-                        <SelectItem key={time} value={time}>
-                          {time}
-                        </SelectItem>
-                      )
-                    })}
-                  </SelectContent>
-                </Select>
-              </div>
+              {!isSeкuritiPerumahan && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="tanggal">Tanggal Kunjungan</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !date && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {date ? format(date, "PPP", { locale: localeId }) : <span>Pilih tanggal</span>}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={date}
+                          onSelect={setDate}
+                          initialFocus
+                          locale={localeId}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="waktu">Waktu Kunjungan</Label>
+                    <Select value={waktuKunjungan} onValueChange={setWaktuKunjungan} required>
+                      <SelectTrigger id="waktu">
+                        <SelectValue placeholder="Pilih jam..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Array.from({ length: 16 }, (_, i) => {
+                          const hour = (i + 7).toString().padStart(2, '0')
+                          const time = `${hour}:00`
+                          return (
+                            <SelectItem key={time} value={time}>
+                              {time}
+                            </SelectItem>
+                          )
+                        })}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </>
+              )}
             </div>
           </section>
 
@@ -295,45 +304,68 @@ export function FormPengajuan({ role, currentUser, masterPerkantoran, masterPabr
               </Button>
             </div>
             
-            <div className="space-y-4">
+            <div className="space-y-3">
               {daftarTamu.map((tamu, index) => (
-                <div key={index} className="grid gap-4 md:grid-cols-12 bg-muted/10 p-4 rounded-md border relative group">
-                  <div className="space-y-2 md:col-span-3">
-                    <Label>Nama Tamu</Label>
-                    <Input value={tamu.nama} onChange={e => handleTamuChange(index, 'nama', e.target.value)} required />
+                <div key={index} className="relative bg-muted/10 border rounded-lg p-4 pt-5">
+                  {/* Guest number label + delete button */}
+                  <div className="absolute top-3 left-4 text-xs font-semibold text-muted-foreground">
+                    Tamu #{index + 1}
                   </div>
-                  <div className="space-y-2 md:col-span-5">
-                    <Label>Alamat / Instansi</Label>
-                    <Input value={tamu.alamat} onChange={e => handleTamuChange(index, 'alamat', e.target.value)} required />
+                  {daftarTamu.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTamu(index)}
+                      className="absolute top-2 right-2 p-1.5 rounded-md text-destructive hover:bg-destructive/10 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+
+                  {/* Row 1: Nama, Alamat, No HP */}
+                  <div className="grid gap-3 grid-cols-1 sm:grid-cols-3 mt-4">
+                    <div className="space-y-1.5">
+                      <Label className="text-xs">Nama Tamu</Label>
+                      <Input
+                        value={tamu.nama}
+                        onChange={e => handleTamuChange(index, 'nama', e.target.value)}
+                        placeholder="Nama lengkap"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs">Alamat / Instansi</Label>
+                      <Input
+                        value={tamu.alamat}
+                        onChange={e => handleTamuChange(index, 'alamat', e.target.value)}
+                        placeholder="Alamat atau instansi"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs">No. HP</Label>
+                      <Input
+                        type="tel"
+                        inputMode="numeric"
+                        value={tamu.no_hp}
+                        onChange={e => handleTamuChange(index, 'no_hp', e.target.value)}
+                        placeholder="08xxxxxxxxxx"
+                        required
+                      />
+                    </div>
                   </div>
-                  <div className="space-y-2 md:col-span-3">
-                    <Label>No. HP</Label>
-                    <Input 
-                      type="tel" 
-                      inputMode="numeric"
-                      value={tamu.no_hp} 
-                      onChange={e => handleTamuChange(index, 'no_hp', e.target.value)} 
-                      required 
-                    />
-                  </div>
-                  {role === 'Sekuriti' && jenisTujuan === 'Perumahan' && (
-                    <div className="space-y-2 md:col-span-12">
-                      <Label>No. Badge Pinjaman</Label>
-                      <Input 
-                        value={tamu.no_badge_pinjaman || ''} 
-                        onChange={e => handleTamuChange(index, 'no_badge_pinjaman', e.target.value)} 
-                        placeholder="Masukkan nomor badge..."
-                        required 
+
+                  {/* Row 2: Badge (only for Sekuriti+Perumahan), same width as one column above */}
+                  {isSeкuritiPerumahan && (
+                    <div className="mt-3 sm:max-w-[33%] space-y-1.5">
+                      <Label className="text-xs">No. Badge Pinjaman</Label>
+                      <Input
+                        value={tamu.no_badge_pinjaman || ''}
+                        onChange={e => handleTamuChange(index, 'no_badge_pinjaman', e.target.value)}
+                        placeholder="Contoh: B-001"
+                        required
                       />
                     </div>
                   )}
-                  <div className="md:col-span-1 flex items-end justify-center pb-1">
-                    {daftarTamu.length > 1 && (
-                      <Button type="button" variant="destructive" size="icon" onClick={() => handleRemoveTamu(index)}>
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    )}
-                  </div>
                 </div>
               ))}
             </div>
