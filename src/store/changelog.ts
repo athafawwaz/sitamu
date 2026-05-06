@@ -1,4 +1,4 @@
-export const APP_VERSION = "1.12.1"
+export const APP_VERSION = "1.13.0"
 
 export interface ChangelogEntry {
   version: string
@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  {
+    version: "1.13.0",
+    date: "2026-05-06",
+    type: "minor",
+    description: "Implement detailed Security Dashboard with split stats, quick actions, and recent activity feed"
+  },
   {
     version: "1.12.1",
     date: "2026-05-06",

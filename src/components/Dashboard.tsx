@@ -1,7 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, Users, Clock, CheckCircle, Sparkles, CalendarDays, Building2 } from "lucide-react"
+import { Plus, Users, Clock, CheckCircle, Sparkles, CalendarDays, Building2, Package, ArrowRight, User } from "lucide-react"
+import { format } from "date-fns"
+import { id } from "date-fns/locale"
 import type { Pegawai, Pengajuan, Role } from "@/store/types"
+import { Badge } from "./ui/badge"
+import { cn } from "@/lib/utils"
 
 interface DashboardProps {
   role: Role;
@@ -10,9 +14,10 @@ interface DashboardProps {
   onNavigateToForm: () => void;
   onNavigateToTable: (tab?: 'outstanding' | 'checkin' | 'checkout' | 'pending') => void;
   onNavigateToApproval?: () => void;
+  onNavigateToPengantaran?: () => void;
 }
 
-export function Dashboard({ role, pegawai, pengajuanList, onNavigateToForm, onNavigateToTable, onNavigateToApproval }: DashboardProps) {
+export function Dashboard({ role, pegawai, pengajuanList, onNavigateToForm, onNavigateToTable, onNavigateToApproval, onNavigateToPengantaran }: DashboardProps) {
   const hour = new Date().getHours()
   let greeting = 'Selamat Malam'
   if (hour < 11) greeting = 'Selamat Pagi'
@@ -97,53 +102,193 @@ export function Dashboard({ role, pegawai, pengajuanList, onNavigateToForm, onNa
     )
   }
 
-  // Sekuriti Dashboard
-  const countOutstanding = pengajuanList.filter(p => p.status === 'outstanding').length
-  const countCheckin = pengajuanList.filter(p => p.status === 'checkin').length
-  const countCheckout = pengajuanList.filter(p => p.status === 'checkout').length
+  // Sekuriti Dashboard Stats
+  const outstanding = pengajuanList.filter(p => p.status === 'outstanding')
+  const checkin = pengajuanList.filter(p => p.status === 'checkin')
+  const checkout = pengajuanList.filter(p => p.status === 'checkout')
+
+  const stats = {
+    outstanding: {
+      total: outstanding.length,
+      tamu: outstanding.filter(p => !p.is_pengantaran).length,
+      pengantaran: outstanding.filter(p => p.is_pengantaran).length
+    },
+    checkin: {
+      total: checkin.length,
+      tamu: checkin.filter(p => !p.is_pengantaran).length,
+      pengantaran: checkin.filter(p => p.is_pengantaran).length
+    },
+    checkout: {
+      total: checkout.length,
+      tamu: checkout.filter(p => !p.is_pengantaran).length,
+      pengantaran: checkout.filter(p => p.is_pengantaran).length
+    }
+  }
+
+  // Activity Feed (Last 5 activities)
+  const recentActivities = [...pengajuanList]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 5)
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-500 pb-10">
       <WelcomeBanner />
 
-      <div>
-        <h2 className="text-2xl font-bold">Ringkasan Hari Ini</h2>
-      </div>
+      {/* Quick Actions for Sekuriti */}
+      <section>
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <Sparkles className="w-5 h-5 text-primary" /> Akses Cepat
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Card 
+            className="group hover:border-primary/50 transition-all cursor-pointer bg-card/40 backdrop-blur-md overflow-hidden relative"
+            onClick={onNavigateToPengantaran}
+          >
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <Package className="w-12 h-12" />
+            </div>
+            <CardContent className="p-5 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
+                <Package className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg">Input Pengantaran</h3>
+                <p className="text-sm text-muted-foreground">Catat Gojek, Paket, atau kiriman lainnya.</p>
+              </div>
+              <ArrowRight className="ml-auto w-5 h-5 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+            </CardContent>
+          </Card>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="bg-card/60 backdrop-blur-xl border border-border/50 shadow-xl cursor-pointer hover:bg-muted/50 transition-all hover:scale-[1.02]" onClick={() => onNavigateToTable('outstanding')}>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Outstanding</CardTitle>
-            <Clock className="w-4 h-4 text-destructive" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-destructive">{countOutstanding}</div>
-            <p className="text-xs text-muted-foreground mt-1">Tamu belum check-in</p>
+          <Card 
+            className="group hover:border-primary/50 transition-all cursor-pointer bg-card/40 backdrop-blur-md overflow-hidden relative"
+            onClick={() => onNavigateToTable('outstanding')}
+          >
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <Users className="w-12 h-12" />
+            </div>
+            <CardContent className="p-5 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                <Users className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg">Kelola Check-In</h3>
+                <p className="text-sm text-muted-foreground">Lihat daftar tamu yang akan datang.</p>
+              </div>
+              <ArrowRight className="ml-auto w-5 h-5 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Main Stats */}
+      <section>
+        <h2 className="text-xl font-bold mb-4">Ringkasan Hari Ini</h2>
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card className="bg-card/60 backdrop-blur-xl border border-border/50 shadow-xl cursor-pointer hover:bg-muted/50 transition-all hover:scale-[1.02]" onClick={() => onNavigateToTable('outstanding')}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Outstanding</CardTitle>
+              <Clock className="w-4 h-4 text-destructive" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-destructive mb-3">{stats.outstanding.total}</div>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="outline" className="bg-slate-50/50 border-slate-200 text-slate-600 flex items-center gap-1 font-normal text-[10px]">
+                  <User className="w-3 h-3" /> {stats.outstanding.tamu} Tamu
+                </Badge>
+                <Badge variant="outline" className="bg-blue-50/50 border-blue-200 text-blue-600 flex items-center gap-1 font-normal text-[10px]">
+                  <Package className="w-3 h-3" /> {stats.outstanding.pengantaran} Paket
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card/60 backdrop-blur-xl border border-border/50 shadow-xl cursor-pointer hover:bg-muted/50 transition-all hover:scale-[1.02]" onClick={() => onNavigateToTable('checkin')}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Sedang Berkunjung</CardTitle>
+              <Users className="w-4 h-4 text-green-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-green-600 mb-3">{stats.checkin.total}</div>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="outline" className="bg-green-50/50 border-green-200 text-green-600 flex items-center gap-1 font-normal text-[10px]">
+                  <User className="w-3 h-3" /> {stats.checkin.tamu} Tamu
+                </Badge>
+                <Badge variant="outline" className="bg-blue-50/50 border-blue-200 text-blue-600 flex items-center gap-1 font-normal text-[10px]">
+                  <Package className="w-3 h-3" /> {stats.checkin.pengantaran} Paket
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card/60 backdrop-blur-xl border border-border/50 shadow-xl cursor-pointer hover:bg-muted/50 transition-all hover:scale-[1.02]" onClick={() => onNavigateToTable('checkout')}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Sudah Keluar</CardTitle>
+              <CheckCircle className="w-4 h-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-muted-foreground mb-3">{stats.checkout.total}</div>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="outline" className="bg-slate-50/50 border-slate-200 text-slate-600 flex items-center gap-1 font-normal text-[10px]">
+                  <User className="w-3 h-3" /> {stats.checkout.tamu} Tamu
+                </Badge>
+                <Badge variant="outline" className="bg-blue-50/50 border-blue-200 text-blue-600 flex items-center gap-1 font-normal text-[10px]">
+                  <Package className="w-3 h-3" /> {stats.checkout.pengantaran} Paket
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Recent Activity Feed */}
+      <section>
+        <h2 className="text-xl font-bold mb-4">Aktivitas Terakhir</h2>
+        <Card className="bg-card/60 backdrop-blur-xl border border-border/50 shadow-xl overflow-hidden">
+          <CardContent className="p-0">
+            {recentActivities.length > 0 ? (
+              <div className="divide-y divide-border/50">
+                {recentActivities.map((activity, idx) => (
+                  <div key={activity.id} className="p-4 flex items-center justify-between hover:bg-muted/30 transition-colors animate-in slide-in-from-left duration-300" style={{ animationDelay: `${idx * 50}ms` }}>
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
+                        activity.is_pengantaran ? "bg-blue-500/10 text-blue-600" : "bg-primary/10 text-primary"
+                      )}>
+                        {activity.is_pengantaran ? <Package className="w-5 h-5" /> : <User className="w-5 h-5" />}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-sm">{activity.tamu.nama}</span>
+                          <Badge variant="outline" className="text-[9px] px-1 h-4 font-normal">
+                            {activity.is_pengantaran ? 'Pengantaran' : 'Tamu'}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {activity.status === 'checkin' ? 'Baru saja Check-In' : 
+                           activity.status === 'checkout' ? 'Telah Check-Out' : 
+                           'Terdaftar (Outstanding)'} — Ke: {activity.alamat_tujuan}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-[10px] font-medium text-muted-foreground">
+                        {format(new Date(activity.created_at), 'HH:mm', { locale: id })}
+                      </div>
+                      <div className="text-[9px] text-muted-foreground/60">
+                        {format(new Date(activity.created_at), 'dd MMM', { locale: id })}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-10 text-center text-muted-foreground text-sm italic">
+                Belum ada aktivitas hari ini.
+              </div>
+            )}
           </CardContent>
         </Card>
-
-        <Card className="bg-card/60 backdrop-blur-xl border border-border/50 shadow-xl cursor-pointer hover:bg-muted/50 transition-all hover:scale-[1.02]" onClick={() => onNavigateToTable('checkin')}>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Check-In</CardTitle>
-            <Users className="w-4 h-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{countCheckin}</div>
-            <p className="text-xs text-muted-foreground mt-1">Tamu sedang berkunjung</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card/60 backdrop-blur-xl border border-border/50 shadow-xl cursor-pointer hover:bg-muted/50 transition-all hover:scale-[1.02]" onClick={() => onNavigateToTable('checkout')}>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Check-Out</CardTitle>
-            <CheckCircle className="w-4 h-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-muted-foreground">{countCheckout}</div>
-            <p className="text-xs text-muted-foreground mt-1">Tamu sudah keluar</p>
-          </CardContent>
-        </Card>
-      </div>
+      </section>
     </div>
   )
 }

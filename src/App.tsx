@@ -128,6 +128,7 @@ function App() {
                   setCurrentView('table')
                 }}
                 onNavigateToApproval={() => setCurrentView('approval')}
+                onNavigateToPengantaran={() => setCurrentView('form_pengantaran')}
               />
             )}
 
