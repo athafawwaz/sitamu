@@ -10,7 +10,7 @@ export interface Pegawai {
 
 export type StatusTamu = 'pending_vp' | 'pending_svp' | 'outstanding' | 'checkin' | 'checkout';
 
-export type ViewType = 'dashboard' | 'form' | 'table' | 'master_perkantoran' | 'master_pabrik' | 'approval';
+export type ViewType = 'dashboard' | 'form' | 'form_pengantaran' | 'table' | 'master_perkantoran' | 'master_pabrik' | 'approval';
 
 export interface Tamu {
   id: string;
@@ -38,6 +38,7 @@ export interface Pengajuan {
   status: StatusTamu;
   penanggung_jawab: Pegawai;
   tamu: Tamu;
+  is_pengantaran?: boolean;
   created_at: string;
   approval_history?: ApprovalHistory[];
 }

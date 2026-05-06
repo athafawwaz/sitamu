@@ -1,6 +1,7 @@
 import { Dashboard } from './components/Dashboard'
 import { Login } from './components/Login'
 import { FormPengajuan } from './components/FormPengajuan'
+import { FormPengantaran } from './components/FormPengantaran'
 import { TablePengajuan } from './components/TablePengajuan'
 import { DetailPengajuan } from './components/DetailPengajuan'
 import { MasterDataView } from './components/MasterDataView'
@@ -121,16 +122,19 @@ function App() {
               />
             )}
 
-            {(currentView === 'form' || currentView === 'table' || currentView === 'approval') && (
+            {(currentView === 'form' || currentView === 'form_pengantaran' || currentView === 'table' || currentView === 'approval') && (
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
                   <h2 className="text-2xl font-bold">
                     {currentView === 'form' ? 'Buat Pengajuan Baru' : 
+                     currentView === 'form_pengantaran' ? 'Form Pengantaran' :
                      currentView === 'approval' ? 'Butuh Approve' : 'Riwayat Pengajuan'}
                   </h2>
                   <p className="text-muted-foreground mt-1 text-sm">
                     {currentView === 'form' 
                       ? 'Isi formulir di bawah ini untuk mendaftarkan tamu Anda.' 
+                      : currentView === 'form_pengantaran'
+                      ? 'Isi data pengantaran (Gojek/Paket dll) di bawah ini.'
                       : currentView === 'approval'
                       ? 'Daftar pengajuan tamu yang membutuhkan persetujuan Anda.'
                       : `Pantau status kunjungan tamu ${user.role === 'Pegawai' ? 'Anda' : 'di lingkungan pabrik'}.`
@@ -139,7 +143,7 @@ function App() {
                 </div>
                 
                 <div className="flex gap-2">
-                  {currentView === 'form' && (
+                  {(currentView === 'form' || currentView === 'form_pengantaran') && (
                     <Button 
                       variant="outline"
                       onClick={() => setCurrentView('table')}
@@ -163,6 +167,17 @@ function App() {
                   currentUser={user.pegawai} 
                   masterPerkantoran={masterPerkantoran}
                   masterPabrik={masterPabrik}
+                  onSubmit={onAddPengajuan} 
+                  onCancel={() => setCurrentView('table')} 
+                />
+              </div>
+            )}
+
+            {currentView === 'form_pengantaran' && (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <FormPengantaran 
+                  role={user.role} 
+                  currentUser={user.pegawai} 
                   onSubmit={onAddPengajuan} 
                   onCancel={() => setCurrentView('table')} 
                 />

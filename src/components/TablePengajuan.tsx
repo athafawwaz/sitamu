@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { Pengajuan, StatusTamu } from "@/store/types"
-import { Eye } from "lucide-react"
+import { Eye, Package, User } from "lucide-react"
 
 interface TablePengajuanProps {
   data: Pengajuan[];
@@ -110,7 +110,18 @@ export function TablePengajuan({ data, onDetailClick }: TablePengajuanProps) {
                     <div className="text-xs text-muted-foreground max-w-[200px] truncate" title={item.keperluan}>{item.keperluan}</div>
                   </TableCell>
                   <TableCell>
-                    <div className="font-medium">{item.tamu.nama}</div>
+                    <div className="flex flex-col items-start gap-1">
+                      <div className="font-medium">{item.tamu.nama}</div>
+                      {item.is_pengantaran ? (
+                        <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200 text-[10px] px-1.5 py-0">
+                          <Package className="w-3 h-3 mr-1" /> Pengantaran
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200 text-[10px] px-1.5 py-0">
+                          <User className="w-3 h-3 mr-1" /> Tamu Umum
+                        </Badge>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell className="text-center">{getStatusBadge(item.status)}</TableCell>
                   <TableCell className="text-center text-xs whitespace-nowrap">

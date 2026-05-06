@@ -1,12 +1,12 @@
 import { useState, useEffect, useMemo } from 'react'
-import type { Pegawai, Pengajuan, Role, StatusTamu } from './types'
+import type { Pegawai, Pengajuan, Role, StatusTamu, ViewType } from './types'
 import { initialPengajuan, masterPerkantoran as initialMasterPerkantoran, masterPabrik as initialMasterPabrik } from './data'
 
 export function useAppStore() {
   const [user, setUser] = useState<{ role: Role, pegawai?: Pegawai } | null>(null)
   const [pengajuanList, setPengajuanList] = useState<Pengajuan[]>(initialPengajuan)
   const [activeTab, setActiveTab] = useState<StatusTamu>('outstanding')
-  const [currentView, setCurrentView] = useState<'dashboard' | 'form' | 'table' | 'master_perkantoran' | 'master_pabrik' | 'approval'>('dashboard')
+  const [currentView, setCurrentView] = useState<ViewType>('dashboard')
   const [selectedPengajuanId, setSelectedPengajuanId] = useState<string | null>(null)
   
   const [masterPerkantoran, setMasterPerkantoran] = useState<string[]>(initialMasterPerkantoran)

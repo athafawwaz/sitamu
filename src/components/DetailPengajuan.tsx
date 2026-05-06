@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import type { Pengajuan, Role, StatusTamu } from "@/store/types"
-import { CheckCircle, Clock, XCircle, Printer } from "lucide-react"
+import { CheckCircle, Clock, XCircle, Printer, Package, User } from "lucide-react"
 import { printFormulir } from "@/lib/print"
 
 interface DetailPengajuanProps {
@@ -118,11 +118,24 @@ export function DetailPengajuan({ pengajuan, role, isOpen, onClose, onCheckIn, o
               <div className="border p-4 rounded-lg bg-card shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
                 
                 <div className="space-y-1 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="font-semibold text-lg">{pengajuan.tamu.nama}</p>
-                    {getStatusBadge(pengajuan.tamu.status)}
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center gap-2">
+                      <p className="font-semibold text-lg">{pengajuan.tamu.nama}</p>
+                      {getStatusBadge(pengajuan.tamu.status)}
+                    </div>
+                    <div>
+                      {pengajuan.is_pengantaran ? (
+                        <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200 w-fit">
+                          <Package className="w-3 h-3 mr-1" /> Pengantaran
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200 w-fit">
+                          <User className="w-3 h-3 mr-1" /> Tamu Umum
+                        </Badge>
+                      )}
+                    </div>
                   </div>
-                  <p className="text-sm text-muted-foreground">HP: {pengajuan.tamu.no_hp} | Alamat: {pengajuan.tamu.alamat}</p>
+                  <p className="text-sm text-muted-foreground">HP: {pengajuan.tamu.no_hp} | Alamat / Instansi: {pengajuan.tamu.alamat}</p>
                   
                   {pengajuan.tamu.status !== 'outstanding' && (
                     <div className="text-xs text-muted-foreground mt-2 flex gap-4">

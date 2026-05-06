@@ -1,4 +1,4 @@
-export const APP_VERSION = "1.11.1"
+export const APP_VERSION = "1.12.0"
 
 export interface ChangelogEntry {
   version: string
@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  {
+    version: "1.12.0",
+    date: "2026-05-06",
+    type: "minor",
+    description: "Implement Pengantaran (Gojek/Paket) feature for Sekuriti, Refactor Mobile Navigation with Hamburger Menu, and fix build warnings"
+  },
   {
     version: "1.11.1",
     date: "2026-05-04",

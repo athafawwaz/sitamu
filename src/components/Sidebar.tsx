@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { LayoutDashboard, FileText, CheckSquare, Database, Building, Factory, LogOut, Info, ChevronLeft, ChevronRight } from "lucide-react"
+import { LayoutDashboard, FileText, CheckSquare, Database, Building, Factory, LogOut, Info, ChevronLeft, ChevronRight, Package } from "lucide-react"
 import type { Pegawai, Role, ViewType } from "@/store/types"
 import { useState } from "react"
 import { APP_VERSION } from "@/store/changelog"
@@ -80,6 +80,22 @@ export function Sidebar({ user, currentView, setCurrentView, onLogout }: Sidebar
           <FileText className={cn("w-4 h-4", !isCollapsed && "mr-2")} /> 
           {!isCollapsed && "Riwayat Pengajuan"}
         </Button>
+
+        {user.role === 'Sekuriti' && (
+          <Button 
+            variant={currentView === 'form_pengantaran' ? 'secondary' : 'ghost'} 
+            className={cn(
+              "w-full transition-all duration-200",
+              isCollapsed ? "justify-center px-0" : "justify-start",
+              !isCollapsed && "pl-8"
+            )}
+            onClick={() => setCurrentView('form_pengantaran')}
+            title={isCollapsed ? "Pengantaran" : ""}
+          >
+            <Package className={cn("w-4 h-4", !isCollapsed && "mr-2")} /> 
+            {!isCollapsed && "Pengantaran"}
+          </Button>
+        )}
         
         {(user.role === 'VP' || user.role === 'SVP_Operasi') && (
           <Button 
