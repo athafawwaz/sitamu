@@ -7,6 +7,7 @@ import { DetailPengajuan } from './components/DetailPengajuan'
 import { MasterDataView } from './components/MasterDataView'
 import { Sidebar } from './components/Sidebar'
 import { MobileHeader } from './components/MobileHeader'
+import { LogoutConfirmModal } from './components/LogoutConfirmModal'
 import type { StatusTamu, Role, Pegawai, Pengajuan } from './store/types'
 import { Button } from './components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from './components/ui/tabs'
@@ -14,6 +15,7 @@ import { Plus } from 'lucide-react'
 import { Toaster } from '@/components/ui/sonner'
 import { toast } from 'sonner'
 import { useAppStore } from './store/useAppStore'
+import { useState } from 'react'
 
 function App() {
   const {
@@ -39,12 +41,19 @@ function App() {
     removeMasterData
   } = useAppStore()
 
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
+
   const onLogin = (role: Role, pegawai?: Pegawai) => {
     handleLogin(role, pegawai)
     toast.success(`Berhasil login sebagai ${pegawai ? pegawai.nama : 'Sekuriti'}`)
   }
 
   const onLogout = () => {
+    setIsLogoutModalOpen(true)
+  }
+
+  const confirmLogout = () => {
+    setIsLogoutModalOpen(false)
     handleLogout()
     toast.info('Berhasil logout dari sistem')
   }
@@ -251,6 +260,11 @@ function App() {
         onCheckIn={onCheckIn}
         onCheckOut={onCheckOut}
         onApprove={onApprove}
+      />
+      <LogoutConfirmModal 
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={confirmLogout}
       />
       <Toaster theme="dark" richColors position="top-right" />
     </div>
