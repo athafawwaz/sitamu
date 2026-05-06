@@ -37,6 +37,7 @@ function App() {
     handleCheckIn,
     handleCheckOut,
     handleApprove,
+    handleBulkApprove,
     addMasterData,
     removeMasterData
   } = useAppStore()
@@ -77,6 +78,11 @@ function App() {
     handleApprove(pengajuanId, user!.role, user!.pegawai!.nama)
     toast.success('Pengajuan tamu berhasil disetujui')
     setSelectedPengajuanId(null)
+  }
+
+  const onBulkApprove = (pengajuanIds: string[]) => {
+    handleBulkApprove(pengajuanIds, user!.role, user!.pegawai!.nama)
+    toast.success(`${pengajuanIds.length} pengajuan berhasil disetujui`)
   }
 
   if (!user) {
@@ -239,6 +245,8 @@ function App() {
             {currentView === 'approval' && (
               <div className="space-y-4 animate-in fade-in duration-500">
                 <TablePengajuan 
+                  enableBulkAction={true}
+                  onBulkApprove={onBulkApprove}
                   data={rawPengajuanList.filter(p => 
                     user.role === 'VP' 
                       ? (p.status === 'pending_vp' && p.penanggung_jawab.unit_kerja === user.pegawai?.unit_kerja) 

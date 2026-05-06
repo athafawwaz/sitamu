@@ -4,14 +4,16 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { Pengajuan, StatusTamu } from "@/store/types"
-import { Eye, Package, User } from "lucide-react"
+import { Eye, Package, User, CheckSquare } from "lucide-react"
 
 interface TablePengajuanProps {
   data: Pengajuan[];
   onDetailClick: (id: string) => void;
+  enableBulkAction?: boolean;
+  onBulkApprove?: (ids: string[]) => void;
 }
 
-export function TablePengajuan({ data, onDetailClick }: TablePengajuanProps) {
+export function TablePengajuan({ data, onDetailClick, enableBulkAction, onBulkApprove }: TablePengajuanProps) {
   const [filters, setFilters] = useState({
     kunjungan: '',
     penanggungJawab: '',
@@ -19,6 +21,7 @@ export function TablePengajuan({ data, onDetailClick }: TablePengajuanProps) {
     namaTamu: '',
     status: ''
   })
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
   
   const getStatusBadge = (status: StatusTamu) => {
     switch (status) {
@@ -63,11 +66,56 @@ export function TablePengajuan({ data, onDetailClick }: TablePengajuanProps) {
     return matchKunjungan && matchPj && matchTujuan && matchTamu && matchStatus
   })
 
+  const isAllSelected = filteredData.length > 0 && selectedIds.length === filteredData.length;
+  const toggleSelectAll = () => {
+    if (isAllSelected) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredData.map(item => item.id));
+    }
+  }
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  }
+
+  const handleBulkApprove = () => {
+    if (onBulkApprove && selectedIds.length > 0) {
+      onBulkApprove(selectedIds);
+      setSelectedIds([]); // Reset selection
+    }
+  }
+
   return (
-    <div className="border border-border/50 rounded-xl overflow-x-auto bg-card/60 backdrop-blur-xl shadow-2xl">
-      <Table>
+    <div className="space-y-4">
+      {enableBulkAction && selectedIds.length > 0 && (
+        <div className="bg-primary/10 border border-primary/20 rounded-xl p-3 flex items-center justify-between animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-center gap-2">
+            <CheckSquare className="w-5 h-5 text-primary" />
+            <span className="font-semibold text-primary">{selectedIds.length} pengajuan terpilih</span>
+          </div>
+          <Button onClick={handleBulkApprove} className="shadow-md shadow-primary/20">
+            Approve {selectedIds.length} Terpilih
+          </Button>
+        </div>
+      )}
+      
+      <div className="border border-border/50 rounded-xl overflow-x-auto bg-card/60 backdrop-blur-xl shadow-2xl">
+        <Table>
         <TableHeader className="bg-muted/50">
           <TableRow>
+            {enableBulkAction && (
+              <TableHead className="w-[40px] text-center">
+                <input 
+                  type="checkbox" 
+                  checked={isAllSelected}
+                  onChange={toggleSelectAll}
+                  className="w-4 h-4 cursor-pointer accent-primary"
+                />
+              </TableHead>
+            )}
             <TableHead className="w-[50px]">No</TableHead>
             <TableHead>Kunjungan</TableHead>
             <TableHead>Penanggung Jawab</TableHead>
@@ -79,6 +127,7 @@ export function TablePengajuan({ data, onDetailClick }: TablePengajuanProps) {
             <TableHead className="text-center">Aksi</TableHead>
           </TableRow>
           <TableRow className="bg-muted/30">
+            {enableBulkAction && <TableHead></TableHead>}
             <TableHead></TableHead>
             <TableHead className="p-2"><Input placeholder="Filter..." value={filters.kunjungan} onChange={(e) => setFilters({...filters, kunjungan: e.target.value})} className="h-8 text-xs font-normal" /></TableHead>
             <TableHead className="p-2"><Input placeholder="Filter..." value={filters.penanggungJawab} onChange={(e) => setFilters({...filters, penanggungJawab: e.target.value})} className="h-8 text-xs font-normal" /></TableHead>
@@ -94,7 +143,17 @@ export function TablePengajuan({ data, onDetailClick }: TablePengajuanProps) {
           {filteredData.length > 0 ? (
             filteredData.map((item, index) => {
               return (
-                <TableRow key={item.id}>
+                <TableRow key={item.id} className={selectedIds.includes(item.id) ? "bg-primary/5" : ""}>
+                  {enableBulkAction && (
+                    <TableCell className="text-center">
+                      <input 
+                        type="checkbox" 
+                        checked={selectedIds.includes(item.id)}
+                        onChange={() => toggleSelect(item.id)}
+                        className="w-4 h-4 cursor-pointer accent-primary"
+                      />
+                    </TableCell>
+                  )}
                   <TableCell>{index + 1}</TableCell>
                   <TableCell>
                     <div className="font-medium whitespace-nowrap">
@@ -148,5 +207,6 @@ export function TablePengajuan({ data, onDetailClick }: TablePengajuanProps) {
         </TableBody>
       </Table>
     </div>
+  </div>
   )
 }

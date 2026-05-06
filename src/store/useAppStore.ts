@@ -135,6 +135,35 @@ export function useAppStore() {
     }))
   }
 
+  const handleBulkApprove = (pengajuanIds: string[], role: Role, namaApprover: string) => {
+    setPengajuanList(prev => prev.map(p => {
+      if (!pengajuanIds.includes(p.id)) return p;
+      
+      let nextStatus = p.status;
+      if (role === 'VP' && p.status === 'pending_vp') {
+        nextStatus = p.jenis_tujuan === 'Pabrik' ? 'pending_svp' : 'outstanding';
+      } else if (role === 'SVP_Operasi' && p.status === 'pending_svp') {
+        nextStatus = 'outstanding';
+      }
+
+      const historyItem = {
+        role,
+        nama_approver: namaApprover,
+        waktu_approval: new Date().toISOString()
+      };
+
+      return {
+        ...p,
+        status: nextStatus,
+        tamu: {
+          ...p.tamu,
+          status: nextStatus
+        },
+        approval_history: [...(p.approval_history || []), historyItem]
+      }
+    }))
+  }
+
   const addMasterData = (type: 'perkantoran' | 'pabrik', value: string) => {
     if (type === 'perkantoran') {
       setMasterPerkantoran(prev => [...prev, value])
@@ -189,6 +218,7 @@ export function useAppStore() {
     handleCheckIn,
     handleCheckOut,
     handleApprove,
+    handleBulkApprove,
     addMasterData,
     removeMasterData
   }
