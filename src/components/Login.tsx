@@ -3,49 +3,47 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Shield, Eye, EyeOff, User, Lock, AlertCircle, ChevronDown, ChevronUp } from "lucide-react"
-import { dummyPegawai } from "@/store/data"
-import type { Pegawai, Role } from "@/store/types"
+import { dummyPegawai, initialMasterTkno } from "@/store/data"
+import type { Pegawai, Role, TknoEntry } from "@/store/types"
 import { APP_VERSION } from "@/store/changelog"
 import { cn } from "@/lib/utils"
 
 interface LoginProps {
   onLogin: (role: Role, pegawai?: Pegawai) => void;
+  onUnauthorized: (badge: string) => void;
+  masterTkno?: TknoEntry[];
 }
 
-const ACCOUNTS = [
-  { badge: 'PSR-001', role: 'Pegawai' as Role,     pegawai: dummyPegawai[0] },
-  { badge: 'PSR-003', role: 'VP' as Role,          pegawai: dummyPegawai[2] },
-  { badge: 'PSR-005', role: 'Sekuriti' as Role,    pegawai: dummyPegawai[4] },
-  { badge: 'PSR-006', role: 'SVP_Operasi' as Role, pegawai: dummyPegawai[5] },
+// TKO accounts — badge berawalan 6
+const TKO_ACCOUNTS = [
+  { badge: '6121501', role: 'Pegawai' as Role,     pegawai: dummyPegawai[0] },
+  { badge: '6121503', role: 'VP' as Role,          pegawai: dummyPegawai[2] },
+  { badge: '6121505', role: 'Sekuriti' as Role,    pegawai: dummyPegawai[4] },
+  { badge: '6121506', role: 'SVP_Operasi' as Role, pegawai: dummyPegawai[5] },
 ];
 
 const DEFAULT_PASSWORD = '12345678';
 
-export function Login({ onLogin }: LoginProps) {
+export function Login({ onLogin, onUnauthorized, masterTkno = initialMasterTkno }: LoginProps) {
   const [badge, setBadge] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showQuickLogin, setShowQuickLogin] = useState(false)
   const [error, setError] = useState('')
 
+  const isTKO = badge.startsWith('6')
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    
+
     if (!badge) {
       setError('Badge tidak boleh kosong');
       return;
     }
-    
+
     if (!password) {
       setError('Password tidak boleh kosong');
-      return;
-    }
-
-    const account = ACCOUNTS.find(acc => acc.badge === badge);
-
-    if (!account) {
-      setError('Badge tidak ditemukan');
       return;
     }
 
@@ -54,7 +52,31 @@ export function Login({ onLogin }: LoginProps) {
       return;
     }
 
-    onLogin(account.role, account.pegawai);
+    if (isTKO) {
+      // TKO: cek dari daftar akun TKO
+      const account = TKO_ACCOUNTS.find(acc => acc.badge === badge.trim());
+      if (!account) {
+        setError('Badge TKO tidak ditemukan');
+        return;
+      }
+      onLogin(account.role, account.pegawai);
+    } else {
+      // TKNO: cek dari master data
+      const tknoEntry = masterTkno.find(t => t.no_badge === badge.trim());
+      if (!tknoEntry) {
+        onUnauthorized(badge.trim());
+        return;
+      }
+      // Login sebagai Pegawai dengan data dari master TKNO
+      const pegawai: Pegawai = {
+        id: parseInt(tknoEntry.id.replace('tkno-', '')) || Date.now(),
+        nama: tknoEntry.nama,
+        no_badge: tknoEntry.no_badge,
+        unit_kerja: tknoEntry.unit_kerja,
+        jabatan: tknoEntry.jabatan
+      };
+      onLogin('Pegawai', pegawai);
+    }
   }
 
   return (
@@ -107,16 +129,16 @@ export function Login({ onLogin }: LoginProps) {
 
             <form onSubmit={handleLogin} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="badge">Badge</Label>
+                <Label htmlFor="badge">No. Badge</Label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-muted-foreground">
                     <User className="w-4 h-4" />
                   </div>
-                  <Input 
-                    id="badge" 
-                    type="text" 
-                    placeholder="Contoh: PSR-001" 
-                    className="pl-10 bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-800"
+                  <Input
+                    id="badge"
+                    type="text"
+                    placeholder="Contoh: 6xxxxxx"
+                    className="pl-10 bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 font-mono"
                     value={badge}
                     onChange={(e) => setBadge(e.target.value)}
                   />
@@ -129,10 +151,10 @@ export function Login({ onLogin }: LoginProps) {
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-muted-foreground">
                     <Lock className="w-4 h-4" />
                   </div>
-                  <Input 
-                    id="password" 
-                    type={showPassword ? "text" : "password"} 
-                    placeholder="••••••••" 
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
                     className="pl-10 pr-10 bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-800"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -166,9 +188,9 @@ export function Login({ onLogin }: LoginProps) {
             </div>
 
             <div className="space-y-3">
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 className={cn("w-full h-10 border-dashed text-primary hover:text-primary hover:bg-primary/5 transition-all", showQuickLogin && "bg-primary/5 border-primary/50")}
                 onClick={() => setShowQuickLogin(!showQuickLogin)}
               >
@@ -183,7 +205,7 @@ export function Login({ onLogin }: LoginProps) {
                     <span>Pilih Akun Demo</span>
                     <span className="font-mono text-[10px] bg-background px-1.5 py-0.5 rounded border text-foreground">PW: {DEFAULT_PASSWORD}</span>
                   </div>
-                  {ACCOUNTS.map((acc, idx) => (
+                  {TKO_ACCOUNTS.map((acc, idx) => (
                     <Button
                       key={idx}
                       variant="secondary"
@@ -193,13 +215,18 @@ export function Login({ onLogin }: LoginProps) {
                       <div className="flex flex-col items-start gap-0.5">
                         <div className="flex items-center gap-2">
                           <span className="font-mono text-xs font-bold text-primary">{acc.badge}</span>
+                          <span className="text-[10px] bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 px-1.5 py-0.5 rounded-full font-semibold uppercase tracking-wider">TKO</span>
                           <span className="text-xs text-muted-foreground">•</span>
-                          <span className="text-sm font-semibold truncate max-w-[150px]">{acc.pegawai ? acc.pegawai.nama : 'Petugas Sekuriti'}</span>
+                          <span className="text-sm font-semibold truncate max-w-[140px]">{acc.pegawai ? acc.pegawai.nama : 'Petugas Sekuriti'}</span>
                         </div>
                         <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{acc.role === 'SVP_Operasi' ? 'SVP Operasi' : acc.role}</span>
                       </div>
                     </Button>
                   ))}
+                  <div className="h-px bg-border/50 my-1" />
+                  <p className="text-[10px] text-muted-foreground px-1">
+                    TKNO: login dengan badge master (cth: <span className="font-mono">3210001</span>) + PW: {DEFAULT_PASSWORD}
+                  </p>
                 </div>
               )}
             </div>

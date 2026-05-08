@@ -1,12 +1,12 @@
-import type { Pegawai, Pengajuan } from './types';
+import type { Pegawai, Pengajuan, TknoEntry } from './types';
 
 export const dummyPegawai: Pegawai[] = [
-  { id: 1, nama: "Budi Santoso", no_badge: "PSR-001", unit_kerja: "Departemen Produksi", jabatan: 'Staff' },
-  { id: 2, nama: "Siti Rahayu", no_badge: "PSR-002", unit_kerja: "Departemen HR", jabatan: 'Staff' },
-  { id: 3, nama: "Ahmad Fauzi", no_badge: "PSR-003", unit_kerja: "Departemen Produksi", jabatan: 'VP' },
-  { id: 4, nama: "Dewi Lestari", no_badge: "PSR-004", unit_kerja: "Departemen IT", jabatan: 'Staff' },
-  { id: 5, nama: "Rizky Pratama", no_badge: "PSR-005", unit_kerja: "Departemen Keamanan", jabatan: 'Sekuriti' },
-  { id: 6, nama: "Haryanto", no_badge: "PSR-006", unit_kerja: "Direktorat Operasi", jabatan: 'SVP_Operasi' }
+  { id: 1, nama: "Budi Santoso",  no_badge: "6121501", unit_kerja: "Departemen Produksi",    jabatan: 'Staff' },
+  { id: 2, nama: "Siti Rahayu",   no_badge: "6121502", unit_kerja: "Departemen HR",          jabatan: 'Staff' },
+  { id: 3, nama: "Ahmad Fauzi",   no_badge: "6121503", unit_kerja: "Departemen Produksi",    jabatan: 'VP' },
+  { id: 4, nama: "Dewi Lestari",  no_badge: "6121504", unit_kerja: "Departemen IT",           jabatan: 'Staff' },
+  { id: 5, nama: "Rizky Pratama", no_badge: "6121505", unit_kerja: "Departemen Keamanan",    jabatan: 'Sekuriti' },
+  { id: 6, nama: "Haryanto",      no_badge: "6121506", unit_kerja: "Direktorat Operasi",     jabatan: 'SVP_Operasi' }
 ];
 
 export const masterPerkantoran = [
@@ -82,4 +82,40 @@ export const initialPengajuan: Pengajuan[] = [
     status: "checkout",
     created_at: new Date(new Date().getTime() - 5 * 60 * 60 * 1000).toISOString()
   }
+];
+
+export const initialMasterTkno: TknoEntry[] = [
+  { id: 'tkno-1', no_badge: '2411249', nama: 'Atha Fawwaz Firjatullah',       unit_kerja: 'Departemen Produksi',  jabatan: 'Staff' },
+  { id: 'tkno-2', no_badge: '3210002', nama: 'Rudi Hartono',      unit_kerja: 'Departemen Utilitas',     jabatan: 'Staff' },
+  { id: 'tkno-3', no_badge: '4110001', nama: 'Sari Permata',      unit_kerja: 'Departemen Logistik',     jabatan: 'Staff' },
+  { id: 'tkno-4', no_badge: '4110002', nama: 'Dian Kusuma',       unit_kerja: 'Departemen Warehouse',    jabatan: 'Staff' },
+  { id: 'tkno-5', no_badge: '5080001', nama: 'Bambang Setiawan',  unit_kerja: 'Departemen Engineering',  jabatan: 'Staff' },
+];
+
+export const masterUnitKerja: string[] = [
+  'Departemen Produksi',
+  'Departemen Utilitas',
+  'Departemen Pemeliharaan',
+  'Departemen Maintenance',
+  'Departemen Engineering',
+  'Departemen Konstruksi',
+  'Departemen K3',
+  'Departemen Keamanan',
+  'Departemen Logistik',
+  'Departemen Warehouse',
+  'Departemen Pengadaan',
+  'Departemen HR',
+  'Departemen Keuangan',
+  'Departemen Akuntansi',
+  'Departemen IT',
+  'Departemen Hukum',
+  'Departemen Komunikasi',
+  'Departemen R&D',
+  'Departemen Pemasaran',
+  'Departemen Catering',
+  'Departemen Sipil',
+  'Direktorat Operasi',
+  'Direktorat Keuangan',
+  'Direktorat SDM & Umum',
+  'Direktorat Teknik & Pengembangan',
 ];

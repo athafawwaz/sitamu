@@ -1,5 +1,13 @@
 export type Role = 'Pegawai' | 'Sekuriti' | 'VP' | 'SVP_Operasi';
 
+export interface TknoEntry {
+  id: string;
+  no_badge: string;
+  nama: string;
+  unit_kerja: string;
+  jabatan: string;
+}
+
 export interface Pegawai {
   id: number;
   nama: string;
@@ -10,7 +18,7 @@ export interface Pegawai {
 
 export type StatusTamu = 'pending_vp' | 'pending_svp' | 'outstanding' | 'checkin' | 'checkout';
 
-export type ViewType = 'dashboard' | 'form' | 'form_pengantaran' | 'table' | 'master_perkantoran' | 'master_pabrik' | 'approval';
+export type ViewType = 'dashboard' | 'form' | 'form_pengantaran' | 'table' | 'master_perkantoran' | 'master_pabrik' | 'approval' | 'master_tkno';
 
 export interface Tamu {
   id: string;

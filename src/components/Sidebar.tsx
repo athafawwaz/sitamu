@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { LayoutDashboard, FileText, CheckSquare, Database, Building, Factory, LogOut, Info, ChevronLeft, ChevronRight, Package } from "lucide-react"
+import { LayoutDashboard, FileText, CheckSquare, Database, Building, Factory, LogOut, Info, ChevronLeft, ChevronRight, Package, Users } from "lucide-react"
 import type { Pegawai, Role, ViewType } from "@/store/types"
 import { useState } from "react"
 import { APP_VERSION } from "@/store/changelog"
@@ -147,6 +147,19 @@ export function Sidebar({ user, currentView, setCurrentView, onLogout }: Sidebar
             >
               <Factory className={cn("w-4 h-4", !isCollapsed && "mr-2")} /> 
               {!isCollapsed && "Pabrik"}
+            </Button>
+            <Button 
+              variant={currentView === 'master_tkno' ? 'secondary' : 'ghost'} 
+              className={cn(
+                "w-full transition-all duration-200",
+                isCollapsed ? "justify-center px-0" : "justify-start",
+                !isCollapsed && "pl-8"
+              )}
+              onClick={() => setCurrentView('master_tkno')}
+              title={isCollapsed ? "Master TKNO" : ""}
+            >
+              <Users className={cn("w-4 h-4", !isCollapsed && "mr-2")} /> 
+              {!isCollapsed && "Master TKNO"}
             </Button>
           </>
         )}

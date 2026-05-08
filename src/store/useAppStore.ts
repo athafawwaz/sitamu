@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
-import type { Pegawai, Pengajuan, Role, StatusTamu, ViewType } from './types'
-import { initialPengajuan, masterPerkantoran as initialMasterPerkantoran, masterPabrik as initialMasterPabrik } from './data'
+import type { Pegawai, Pengajuan, Role, StatusTamu, TknoEntry, ViewType } from './types'
+import { initialPengajuan, masterPerkantoran as initialMasterPerkantoran, masterPabrik as initialMasterPabrik, initialMasterTkno } from './data'
 
 export function useAppStore() {
   const [user, setUser] = useState<{ role: Role, pegawai?: Pegawai } | null>(null)
@@ -11,6 +11,7 @@ export function useAppStore() {
   
   const [masterPerkantoran, setMasterPerkantoran] = useState<string[]>(initialMasterPerkantoran)
   const [masterPabrik, setMasterPabrik] = useState<string[]>(initialMasterPabrik)
+  const [masterTkno, setMasterTkno] = useState<TknoEntry[]>(initialMasterTkno)
 
   // Load from local storage
   useEffect(() => {
@@ -41,6 +42,14 @@ export function useAppStore() {
         if (parsed && parsed.length > 0) setMasterPabrik(parsed)
       } catch(e) {}
     }
+
+    const savedTkno = localStorage.getItem('masterTkno')
+    if (savedTkno) {
+      try {
+        const parsed = JSON.parse(savedTkno)
+        if (parsed && parsed.length > 0) setMasterTkno(parsed)
+      } catch(e) {}
+    }
   }, [])
 
   useEffect(() => {
@@ -54,6 +63,10 @@ export function useAppStore() {
   useEffect(() => {
     localStorage.setItem('masterPabrik', JSON.stringify(masterPabrik))
   }, [masterPabrik])
+
+  useEffect(() => {
+    localStorage.setItem('masterTkno', JSON.stringify(masterTkno))
+  }, [masterTkno])
 
   const handleLogin = (role: Role, pegawai?: Pegawai) => {
     setUser({ role, pegawai })
@@ -180,6 +193,14 @@ export function useAppStore() {
     }
   }
 
+  const addTkno = (entry: TknoEntry) => {
+    setMasterTkno(prev => [...prev, entry])
+  }
+
+  const removeTkno = (id: string) => {
+    setMasterTkno(prev => prev.filter(t => t.id !== id))
+  }
+
   const rawPengajuanList = pengajuanList;
   const filteredPengajuan = useMemo(() => {
     let filtered = pengajuanList;
@@ -209,6 +230,7 @@ export function useAppStore() {
     rawPengajuanList,
     masterPerkantoran,
     masterPabrik,
+    masterTkno,
     setActiveTab,
     setCurrentView,
     setSelectedPengajuanId,
@@ -220,6 +242,8 @@ export function useAppStore() {
     handleApprove,
     handleBulkApprove,
     addMasterData,
-    removeMasterData
+    removeMasterData,
+    addTkno,
+    removeTkno
   }
 }

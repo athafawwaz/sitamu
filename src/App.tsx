@@ -5,6 +5,8 @@ import { FormPengantaran } from './components/FormPengantaran'
 import { TablePengajuan } from './components/TablePengajuan'
 import { DetailPengajuan } from './components/DetailPengajuan'
 import { MasterDataView } from './components/MasterDataView'
+import { MasterTknoView } from './components/MasterTknoView'
+import { UnauthorizedView } from './components/UnauthorizedView'
 import { Sidebar } from './components/Sidebar'
 import { MobileHeader } from './components/MobileHeader'
 import { LogoutConfirmModal } from './components/LogoutConfirmModal'
@@ -28,6 +30,7 @@ function App() {
     rawPengajuanList,
     masterPerkantoran,
     masterPabrik,
+    masterTkno,
     setActiveTab,
     setCurrentView,
     setSelectedPengajuanId,
@@ -39,10 +42,13 @@ function App() {
     handleApprove,
     handleBulkApprove,
     addMasterData,
-    removeMasterData
+    removeMasterData,
+    addTkno,
+    removeTkno
   } = useAppStore()
 
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
+  const [unauthorizedBadge, setUnauthorizedBadge] = useState<string | null>(null)
 
   const onLogin = (role: Role, pegawai?: Pegawai) => {
     handleLogin(role, pegawai)
@@ -85,10 +91,23 @@ function App() {
     toast.success(`${pengajuanIds.length} pengajuan berhasil disetujui`)
   }
 
+  if (unauthorizedBadge) {
+    return (
+      <>
+        <UnauthorizedView badge={unauthorizedBadge} onBack={() => setUnauthorizedBadge(null)} />
+        <Toaster theme="dark" richColors position="top-right" />
+      </>
+    )
+  }
+
   if (!user) {
     return (
       <>
-        <Login onLogin={onLogin} />
+        <Login
+          onLogin={onLogin}
+          onUnauthorized={(badge) => setUnauthorizedBadge(badge)}
+          masterTkno={masterTkno}
+        />
         <Toaster theme="dark" richColors position="top-right" />
       </>
     )
@@ -215,6 +234,14 @@ function App() {
                 data={masterPabrik}
                 onAdd={(v) => addMasterData('pabrik', v)}
                 onRemove={(v) => removeMasterData('pabrik', v)}
+              />
+            )}
+
+            {currentView === 'master_tkno' && (
+              <MasterTknoView
+                data={masterTkno}
+                onAdd={addTkno}
+                onRemove={removeTkno}
               />
             )}
 
