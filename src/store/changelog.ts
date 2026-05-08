@@ -1,4 +1,4 @@
-export const APP_VERSION = "1.15.5"
+export const APP_VERSION = "1.15.6"
 
 export interface ChangelogEntry {
   version: string
@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  {
+    version: "1.15.6",
+    date: "2026-05-08",
+    type: "patch",
+    description: "Add Master TKNO menu item to mobile hamburger menu for Security role"
+  },
   {
     version: "1.15.5",
     date: "2026-05-08",

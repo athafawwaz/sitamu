@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { LayoutDashboard, FileText, CheckSquare, LogOut, Building, Factory, Package, Menu } from "lucide-react"
+import { LayoutDashboard, FileText, CheckSquare, LogOut, Building, Factory, Package, Menu, Users } from "lucide-react"
 import type { Pegawai, Role, ViewType } from "@/store/types"
 import { APP_VERSION } from "@/store/changelog"
 import { cn } from "@/lib/utils"
@@ -111,6 +111,13 @@ export function MobileHeader({ currentView, setCurrentView, onLogout, user }: Mo
                     onClick={() => { setCurrentView('master_pabrik'); setIsMenuOpen(false); }}
                   >
                     <Factory className="w-4 h-4 mr-2" /> Pabrik
+                  </Button>
+                  <Button 
+                    variant={currentView === 'master_tkno' ? 'secondary' : 'ghost'} 
+                    className="w-full justify-start text-sm h-10"
+                    onClick={() => { setCurrentView('master_tkno'); setIsMenuOpen(false); }}
+                  >
+                    <Users className="w-4 h-4 mr-2" /> Master TKNO
                   </Button>
                   <div className="h-px bg-border my-1 mx-2" />
                 </>
