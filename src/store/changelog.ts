@@ -1,4 +1,4 @@
-export const APP_VERSION = "1.15.0"
+export const APP_VERSION = "1.15.1"
 
 export interface ChangelogEntry {
   version: string
@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  {
+    version: "1.15.1",
+    date: "2026-05-08",
+    type: "patch",
+    description: "Fix ID collision for TKNO login by deriving ID from badge number"
+  },
   {
     version: "1.15.0",
     date: "2026-05-08",

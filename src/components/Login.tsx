@@ -68,8 +68,9 @@ export function Login({ onLogin, onUnauthorized, masterTkno = initialMasterTkno 
         return;
       }
       // Login sebagai Pegawai dengan data dari master TKNO
+      // id di-derive dari no_badge (numerik) agar tidak bentrok dengan TKO id (1-6)
       const pegawai: Pegawai = {
-        id: parseInt(tknoEntry.id.replace('tkno-', '')) || Date.now(),
+        id: parseInt(tknoEntry.no_badge) || Date.now(),
         nama: tknoEntry.nama,
         no_badge: tknoEntry.no_badge,
         unit_kerja: tknoEntry.unit_kerja,
