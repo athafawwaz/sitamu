@@ -1,4 +1,4 @@
-export const APP_VERSION = "1.15.3"
+export const APP_VERSION = "1.15.5"
 
 export interface ChangelogEntry {
   version: string
@@ -8,6 +8,18 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  {
+    version: "1.15.5",
+    date: "2026-05-08",
+    type: "patch",
+    description: "Fix Shield ReferenceError in Login page and finalize Pusri logo branding across all headers"
+  },
+  {
+    version: "1.15.4",
+    date: "2026-05-08",
+    type: "patch",
+    description: "Replace application logo with Pusri emblem across Login, Sidebar, and Mobile Header"
+  },
   {
     version: "1.15.3",
     date: "2026-05-08",

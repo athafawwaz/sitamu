@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Shield, Eye, EyeOff, User, Lock, AlertCircle, ChevronDown, ChevronUp } from "lucide-react"
+import { Eye, EyeOff, User, Users, Lock, AlertCircle, ChevronDown, ChevronUp } from "lucide-react"
 import { dummyPegawai, initialMasterTkno } from "@/store/data"
 import type { Pegawai, Role, TknoEntry } from "@/store/types"
 import { APP_VERSION } from "@/store/changelog"
@@ -91,10 +91,12 @@ export function Login({ onLogin, onUnauthorized, masterTkno = initialMasterTkno 
         </div>
         
         <div className="z-10 flex flex-col items-center text-center">
-          <div className="bg-white p-4 rounded-2xl shadow-2xl mb-8">
-            <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center border border-blue-200">
-              <Shield className="w-10 h-10 text-primary" />
-            </div>
+          <div className="mb-8 p-1">
+            <img 
+              src="/Logo Emblem Pusri Dark.svg" 
+              alt="Pusri Logo" 
+              className="w-32 h-32 lg:w-40 lg:h-40 object-contain drop-shadow-2xl animate-in zoom-in duration-700" 
+            />
           </div>
           <h1 className="text-4xl lg:text-5xl font-bold text-white tracking-tight mb-4">
             SI TAMU
@@ -114,9 +116,11 @@ export function Login({ onLogin, onUnauthorized, masterTkno = initialMasterTkno 
         <div className="flex-1 flex flex-col justify-center w-full max-w-[400px] z-10 min-h-fit py-8 md:py-0">
           {/* Mobile Logo */}
           <div className="md:hidden flex flex-col items-center mb-8">
-            <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
-              <Shield className="w-7 h-7 text-primary" />
-            </div>
+            <img 
+              src="/Logo Emblem Pusri Dark.svg" 
+              alt="Pusri Logo" 
+              className="w-20 h-20 object-contain mb-4" 
+            />
             <h1 className="text-2xl font-bold tracking-tight">SI TAMU</h1>
           </div>
 
@@ -195,7 +199,7 @@ export function Login({ onLogin, onUnauthorized, masterTkno = initialMasterTkno 
                 className={cn("w-full h-10 border-dashed text-primary hover:text-primary hover:bg-primary/5 transition-all", showQuickLogin && "bg-primary/5 border-primary/50")}
                 onClick={() => setShowQuickLogin(!showQuickLogin)}
               >
-                <Shield className="w-4 h-4 mr-2" />
+                <Users className="w-4 h-4 mr-2" />
                 Quick Login (Dev)
                 {showQuickLogin ? <ChevronUp className="w-4 h-4 ml-2" /> : <ChevronDown className="w-4 h-4 ml-2" />}
               </Button>

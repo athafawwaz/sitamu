@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { LayoutDashboard, FileText, CheckSquare, LogOut, Building, Factory, Shield, Package, Menu } from "lucide-react"
+import { LayoutDashboard, FileText, CheckSquare, LogOut, Building, Factory, Package, Menu } from "lucide-react"
 import type { Pegawai, Role, ViewType } from "@/store/types"
 import { APP_VERSION } from "@/store/changelog"
 import { cn } from "@/lib/utils"
@@ -33,7 +33,11 @@ export function MobileHeader({ currentView, setCurrentView, onLogout, user }: Mo
       {/* Top Header Bar */}
       <header className="md:hidden bg-card/60 backdrop-blur-2xl border-b border-border/50 h-14 flex items-center justify-between px-4 shrink-0 z-20">
         <div className="flex items-center gap-2 font-bold">
-          <Shield className="w-5 h-5 text-primary" />
+          <img 
+            src="/Logo Emblem Pusri Dark.svg" 
+            alt="Logo" 
+            className="w-6 h-6 object-contain" 
+          />
           <div className="flex flex-col leading-none">
             <span className="text-sm font-bold">SI TAMU</span>
             <span className="text-[9px] text-primary font-mono font-normal">v{APP_VERSION}</span>
