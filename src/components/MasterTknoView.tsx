@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,24 +8,30 @@ import { Trash2, Plus, Users, Search, Loader2, CheckCircle2, AlertCircle } from 
 import type { TknoEntry } from "@/store/types"
 import { masterUnitKerja } from "@/store/data"
 
+// Seluruh database SSO — untuk suggestions + fetch
+const SSO_DATABASE: Record<string, Omit<TknoEntry, 'id'>> = {
+  '3210003': { no_badge: '3210003', nama: 'Ferry Susanto',   unit_kerja: 'Departemen Maintenance', jabatan: 'Teknisi' },
+  '3210004': { no_badge: '3210004', nama: 'Nurul Hidayah',  unit_kerja: 'Departemen K3',          jabatan: 'Staff K3' },
+  '4110003': { no_badge: '4110003', nama: 'Wahyu Pratama',  unit_kerja: 'Departemen Logistik',    jabatan: 'Driver' },
+  '4110004': { no_badge: '4110004', nama: 'Lina Marlina',   unit_kerja: 'Departemen Catering',    jabatan: 'Staff' },
+  '5080002': { no_badge: '5080002', nama: 'Tono Wibowo',    unit_kerja: 'Departemen Engineering', jabatan: 'Drafter' },
+  '7090001': { no_badge: '7090001', nama: 'Hendra Gunawan', unit_kerja: 'Departemen Konstruksi',  jabatan: 'Mandor' },
+  '8010001': { no_badge: '8010001', nama: 'Agung Santoso',  unit_kerja: 'Departemen Sipil',       jabatan: 'Surveyor' },
+}
+
 // Simulasi SSO fetch — di production diganti dengan real API call
 function mockSsoFetch(badge: string): Promise<Omit<TknoEntry, 'id'> | null> {
-  const ssoDatabase: Record<string, Omit<TknoEntry, 'id'>> = {
-    '3210003': { no_badge: '3210003', nama: 'Ferry Susanto',    unit_kerja: 'Departemen Maintenance',  jabatan: 'Teknisi' },
-    '3210004': { no_badge: '3210004', nama: 'Nurul Hidayah',   unit_kerja: 'Departemen K3',           jabatan: 'Staff K3' },
-    '4110003': { no_badge: '4110003', nama: 'Wahyu Pratama',   unit_kerja: 'Departemen Logistik',     jabatan: 'Driver' },
-    '4110004': { no_badge: '4110004', nama: 'Lina Marlina',    unit_kerja: 'Departemen Catering',     jabatan: 'Staff' },
-    '5080002': { no_badge: '5080002', nama: 'Tono Wibowo',     unit_kerja: 'Departemen Engineering',  jabatan: 'Drafter' },
-    '7090001': { no_badge: '7090001', nama: 'Hendra Gunawan',  unit_kerja: 'Departemen Konstruksi',   jabatan: 'Mandor' },
-    '8010001': { no_badge: '8010001', nama: 'Agung Santoso',   unit_kerja: 'Departemen Sipil',        jabatan: 'Surveyor' },
-  }
-
   return new Promise((resolve) => {
-    setTimeout(() => {
-      const result = ssoDatabase[badge] ?? null
-      resolve(result)
-    }, 800)
+    setTimeout(() => resolve(SSO_DATABASE[badge] ?? null), 800)
   })
+}
+
+// Partial match untuk suggestions dropdown
+function mockSsoSearch(query: string): Omit<TknoEntry, 'id'>[] {
+  if (!query || query.length < 2) return []
+  return Object.values(SSO_DATABASE).filter(e =>
+    e.no_badge.includes(query) || e.nama.toLowerCase().includes(query.toLowerCase())
+  )
 }
 
 interface MasterTknoViewProps {
@@ -42,18 +48,69 @@ export function MasterTknoView({ data, onAdd, onRemove }: MasterTknoViewProps) {
   const [manualForm, setManualForm] = useState({ nama: '', unit_kerja: '' })
   const [useManual, setUseManual] = useState(false)
 
+  // Suggestions dropdown state
+  const [suggestions, setSuggestions] = useState<Omit<TknoEntry, 'id'>[]>([])
+  const [showDropdown, setShowDropdown] = useState(false)
+  const wrapperRef = useRef<HTMLDivElement>(null)
+
   const isTko = badgeInput.startsWith('6')
+  const alreadyExists = data.some(d => d.no_badge === badgeInput.trim())
+
+  // Live suggestions saat mengetik
+  useEffect(() => {
+    const trimmed = badgeInput.trim()
+    if (!trimmed || isTko || trimmed.length < 2) {
+      setSuggestions([])
+      setShowDropdown(false)
+      return
+    }
+    // Filter suggestions: exclude yang sudah terdaftar di master data
+    const results = mockSsoSearch(trimmed).filter(s => !data.some(d => d.no_badge === s.no_badge))
+    setSuggestions(results)
+    setShowDropdown(results.length > 0)
+  }, [badgeInput, isTko, data])
+
+  // Tutup dropdown saat klik di luar
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setShowDropdown(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
 
   const handleFetchSSO = async () => {
-    if (!badgeInput.trim()) return
-    if (isTko) return // TKO tidak boleh masuk master TKNO
-    if (data.some(d => d.no_badge === badgeInput.trim())) return // sudah ada
+    const trimmed = badgeInput.trim()
+    if (!trimmed || isTko || alreadyExists) return
 
+    setShowDropdown(false)
     setFetchState('loading')
     setSsoResult(null)
     setUseManual(false)
 
-    const result = await mockSsoFetch(badgeInput.trim())
+    const result = await mockSsoFetch(trimmed)
+    if (result) {
+      setSsoResult(result)
+      setFetchState('found')
+    } else {
+      setFetchState('notfound')
+      setManualForm({ nama: '', unit_kerja: '' })
+      setUseManual(true)
+    }
+  }
+
+  // Pilih dari dropdown — isi badge dan langsung fetch
+  const handleSelectSuggestion = async (entry: Omit<TknoEntry, 'id'>) => {
+    setBadgeInput(entry.no_badge)
+    setShowDropdown(false)
+    setSuggestions([])
+    setFetchState('loading')
+    setSsoResult(null)
+    setUseManual(false)
+
+    const result = await mockSsoFetch(entry.no_badge)
     if (result) {
       setSsoResult(result)
       setFetchState('found')
@@ -73,12 +130,7 @@ export function MasterTknoView({ data, onAdd, onRemove }: MasterTknoViewProps) {
       if (!ssoResult) return
       entryData = ssoResult
     }
-
-    const newEntry: TknoEntry = {
-      id: `tkno-${Date.now()}`,
-      ...entryData
-    }
-    onAdd(newEntry)
+    onAdd({ id: `tkno-${Date.now()}`, ...entryData })
     resetForm()
   }
 
@@ -88,9 +140,9 @@ export function MasterTknoView({ data, onAdd, onRemove }: MasterTknoViewProps) {
     setFetchState('idle')
     setManualForm({ nama: '', unit_kerja: '' })
     setUseManual(false)
+    setSuggestions([])
+    setShowDropdown(false)
   }
-
-  const alreadyExists = data.some(d => d.no_badge === badgeInput.trim())
 
   const filteredData = data.filter(t =>
     t.no_badge.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -120,26 +172,61 @@ export function MasterTknoView({ data, onAdd, onRemove }: MasterTknoViewProps) {
         </CardHeader>
 
         <CardContent className="p-6 space-y-6">
-          {/* Fetch SSO Form */}
           <div className="space-y-4">
             <Label className="text-sm font-semibold">Tambah TKNO</Label>
 
-            <div className="flex gap-2">
-              <div className="flex-1">
+            {/* Input + Dropdown wrapper */}
+            <div className="flex gap-2 items-start">
+              <div className="flex-1 relative" ref={wrapperRef}>
                 <Input
                   id="badge-tkno"
                   placeholder="Masukkan No. Badge TKNO..."
                   value={badgeInput}
                   onChange={e => {
                     setBadgeInput(e.target.value)
-                    setFetchState('idle')
-                    setSsoResult(null)
-                    setUseManual(false)
+                    // Reset hasil fetch saat badge diubah
+                    if (fetchState !== 'idle') {
+                      setSsoResult(null)
+                      setFetchState('idle')
+                      setUseManual(false)
+                    }
                   }}
                   className="font-mono"
-                  onKeyDown={e => { if (e.key === 'Enter') handleFetchSSO() }}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') handleFetchSSO()
+                    if (e.key === 'Escape') { resetForm(); setShowDropdown(false) }
+                  }}
+                  onFocus={() => { if (suggestions.length > 0) setShowDropdown(true) }}
+                  autoComplete="off"
                 />
+
+                {/* Live suggestions dropdown */}
+                {showDropdown && suggestions.length > 0 && (
+                  <div className="absolute z-50 top-full mt-1 left-0 right-0 bg-popover border border-border rounded-lg shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">
+                    <div className="px-3 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider border-b bg-muted/30">
+                      Klik untuk pilih
+                    </div>
+                    {suggestions.map(s => (
+                      <button
+                        key={s.no_badge}
+                        type="button"
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-muted/50 transition-colors"
+                        onMouseDown={e => {
+                          e.preventDefault() // jangan trigger onBlur
+                          handleSelectSuggestion(s)
+                        }}
+                      >
+                        <span className="font-mono text-sm font-bold text-primary w-20 shrink-0">{s.no_badge}</span>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium truncate">{s.nama}</p>
+                          <p className="text-xs text-muted-foreground truncate">{s.unit_kerja}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
+
               <Button
                 onClick={handleFetchSSO}
                 disabled={!badgeInput.trim() || fetchState === 'loading' || isTko || alreadyExists}
@@ -172,7 +259,7 @@ export function MasterTknoView({ data, onAdd, onRemove }: MasterTknoViewProps) {
               <div className="p-4 rounded-xl border-2 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/20 space-y-3">
                 <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
                   <CheckCircle2 className="w-4 h-4" />
-                  <span className="text-sm font-semibold">Data ditemukan dari SSO</span>
+                  <span className="text-sm font-semibold">Data ditemukan:</span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                   <div>
@@ -199,7 +286,7 @@ export function MasterTknoView({ data, onAdd, onRemove }: MasterTknoViewProps) {
                 <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
                   <AlertCircle className="w-4 h-4" />
                   <span className="text-sm font-semibold">
-                    Badge <span className="font-mono">{badgeInput}</span> tidak ditemukan di SSO — isi manual
+                    Badge <span className="font-mono">{badgeInput}</span> tidak ditemukan — isi manual
                   </span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
