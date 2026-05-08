@@ -1,4 +1,4 @@
-export const APP_VERSION = "1.15.2"
+export const APP_VERSION = "1.15.3"
 
 export interface ChangelogEntry {
   version: string
@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  {
+    version: "1.15.3",
+    date: "2026-05-08",
+    type: "patch",
+    description: "Redesign Unit Kerja dropdown with custom styled UI and smooth animations"
+  },
   {
     version: "1.15.2",
     date: "2026-05-08",

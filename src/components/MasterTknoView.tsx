@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { Trash2, Plus, Users, Search, Loader2, CheckCircle2, AlertCircle } from "lucide-react"
+import { Trash2, Plus, Users, Search, Loader2, CheckCircle2, AlertCircle, ChevronDown, Check } from "lucide-react"
 import type { TknoEntry } from "@/store/types"
 import { masterUnitKerja } from "@/store/data"
 
@@ -47,6 +47,8 @@ export function MasterTknoView({ data, onAdd, onRemove }: MasterTknoViewProps) {
   const [fetchState, setFetchState] = useState<'idle' | 'loading' | 'found' | 'notfound'>('idle')
   const [manualForm, setManualForm] = useState({ nama: '', unit_kerja: '' })
   const [useManual, setUseManual] = useState(false)
+  const [unitDropdownOpen, setUnitDropdownOpen] = useState(false)
+  const unitDropdownRef = useRef<HTMLDivElement>(null)
 
   // Suggestions dropdown state
   const [suggestions, setSuggestions] = useState<Omit<TknoEntry, 'id'>[]>([])
@@ -70,11 +72,14 @@ export function MasterTknoView({ data, onAdd, onRemove }: MasterTknoViewProps) {
     setShowDropdown(results.length > 0)
   }, [badgeInput, isTko, data])
 
-  // Tutup dropdown saat klik di luar
+  // Tutup dropdown unit kerja saat klik di luar
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
         setShowDropdown(false)
+      }
+      if (unitDropdownRef.current && !unitDropdownRef.current.contains(e.target as Node)) {
+        setUnitDropdownOpen(false)
       }
     }
     document.addEventListener('mousedown', handler)
@@ -298,18 +303,44 @@ export function MasterTknoView({ data, onAdd, onRemove }: MasterTknoViewProps) {
                       onChange={e => setManualForm(p => ({ ...p, nama: e.target.value }))}
                     />
                   </div>
-                  <div className="space-y-1">
+                  <div className="space-y-1" ref={unitDropdownRef}>
                     <Label className="text-xs">Unit Kerja *</Label>
-                    <select
-                      value={manualForm.unit_kerja}
-                      onChange={e => setManualForm(p => ({ ...p, unit_kerja: e.target.value }))}
-                      className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      <option value="">-- Pilih Unit Kerja --</option>
-                      {masterUnitKerja.map(uk => (
-                        <option key={uk} value={uk}>{uk}</option>
-                      ))}
-                    </select>
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setUnitDropdownOpen(p => !p)}
+                        className={`flex h-9 w-full items-center justify-between rounded-md border px-3 py-1 text-sm shadow-sm transition-colors hover:bg-muted/50 focus:outline-none focus:ring-1 focus:ring-ring ${
+                          manualForm.unit_kerja ? 'border-primary/50 text-foreground' : 'border-input text-muted-foreground'
+                        }`}
+                      >
+                        <span className="truncate">{manualForm.unit_kerja || 'Pilih Unit Kerja'}</span>
+                        <ChevronDown className={`w-4 h-4 shrink-0 ml-2 transition-transform duration-200 ${unitDropdownOpen ? 'rotate-180' : ''}`} />
+                      </button>
+
+                      {unitDropdownOpen && (
+                        <div className="absolute z-50 top-full mt-1 left-0 right-0 bg-popover border border-border rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">
+                          <div className="max-h-52 overflow-y-auto">
+                            {masterUnitKerja.map(uk => (
+                              <button
+                                key={uk}
+                                type="button"
+                                onMouseDown={e => {
+                                  e.preventDefault()
+                                  setManualForm(p => ({ ...p, unit_kerja: uk }))
+                                  setUnitDropdownOpen(false)
+                                }}
+                                className={`w-full flex items-center justify-between px-3 py-2 text-sm text-left transition-colors hover:bg-muted/60 ${
+                                  manualForm.unit_kerja === uk ? 'bg-primary/10 text-primary font-medium' : ''
+                                }`}
+                              >
+                                <span>{uk}</span>
+                                {manualForm.unit_kerja === uk && <Check className="w-3.5 h-3.5 shrink-0" />}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="flex gap-2 pt-1">
