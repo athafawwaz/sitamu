@@ -6,17 +6,16 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Trash2, Plus, Users, Search, Loader2, CheckCircle2, AlertCircle, ChevronDown, Check } from "lucide-react"
 import type { TknoEntry } from "@/store/types"
-import { masterUnitKerja } from "@/store/data"
 
 // Seluruh database SSO — untuk suggestions + fetch
 const SSO_DATABASE: Record<string, Omit<TknoEntry, 'id'>> = {
-  '3210003': { no_badge: '3210003', nama: 'Ferry Susanto',   unit_kerja: 'Departemen Maintenance', jabatan: 'Teknisi' },
-  '3210004': { no_badge: '3210004', nama: 'Nurul Hidayah',  unit_kerja: 'Departemen K3',          jabatan: 'Staff K3' },
-  '4110003': { no_badge: '4110003', nama: 'Wahyu Pratama',  unit_kerja: 'Departemen Logistik',    jabatan: 'Driver' },
-  '4110004': { no_badge: '4110004', nama: 'Lina Marlina',   unit_kerja: 'Departemen Catering',    jabatan: 'Staff' },
-  '5080002': { no_badge: '5080002', nama: 'Tono Wibowo',    unit_kerja: 'Departemen Engineering', jabatan: 'Drafter' },
-  '7090001': { no_badge: '7090001', nama: 'Hendra Gunawan', unit_kerja: 'Departemen Konstruksi',  jabatan: 'Mandor' },
-  '8010001': { no_badge: '8010001', nama: 'Agung Santoso',  unit_kerja: 'Departemen Sipil',       jabatan: 'Surveyor' },
+  '3210003': { no_badge: '3210003', nama: 'Ferry Susanto',   unit_kerja: '', jabatan: 'Staff' },
+  '3210004': { no_badge: '3210004', nama: 'Nurul Hidayah',  unit_kerja: '', jabatan: 'Staff' },
+  '4110003': { no_badge: '4110003', nama: 'Wahyu Pratama',  unit_kerja: '', jabatan: 'Staff' },
+  '4110004': { no_badge: '4110004', nama: 'Lina Marlina',   unit_kerja: '', jabatan: 'Staff' },
+  '5080002': { no_badge: '5080002', nama: 'Tono Wibowo',    unit_kerja: '', jabatan: 'Staff' },
+  '7090001': { no_badge: '7090001', nama: 'Hendra Gunawan', unit_kerja: '', jabatan: 'Staff' },
+  '8010001': { no_badge: '8010001', nama: 'Agung Santoso',  unit_kerja: '', jabatan: 'Staff' },
 }
 
 // Simulasi SSO fetch — di production diganti dengan real API call
@@ -36,11 +35,12 @@ function mockSsoSearch(query: string): Omit<TknoEntry, 'id'>[] {
 
 interface MasterTknoViewProps {
   data: TknoEntry[]
+  masterUnitKerja: string[]
   onAdd: (entry: TknoEntry) => void
   onRemove: (id: string) => void
 }
 
-export function MasterTknoView({ data, onAdd, onRemove }: MasterTknoViewProps) {
+export function MasterTknoView({ data, masterUnitKerja, onAdd, onRemove }: MasterTknoViewProps) {
   const [badgeInput, setBadgeInput] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [ssoResult, setSsoResult] = useState<Omit<TknoEntry, 'id'> | null>(null)
@@ -166,7 +166,7 @@ export function MasterTknoView({ data, onAdd, onRemove }: MasterTknoViewProps) {
           <div>
             <CardTitle className="text-xl">Master Data TKNO</CardTitle>
             <p className="text-sm text-muted-foreground mt-1">
-              Kelola daftar TKNO yang berwenang sebagai PIC Tamu di pabrik
+              Kelola daftar TKNO yang berwenang sebagai PIC Tamu Unit Kerja
             </p>
           </div>
           <div className="ml-auto">
@@ -259,100 +259,109 @@ export function MasterTknoView({ data, onAdd, onRemove }: MasterTknoViewProps) {
               </div>
             )}
 
-            {/* SSO Result */}
-            {fetchState === 'found' && ssoResult && (
-              <div className="p-4 rounded-xl border-2 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/20 space-y-3">
-                <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span className="text-sm font-semibold">Data ditemukan:</span>
+            {/* SSO Result / Manual Review Section */}
+            {(fetchState === 'found' || (fetchState === 'notfound' && useManual)) && (
+              <div className={`p-5 rounded-xl border-2 transition-all duration-300 ${
+                fetchState === 'found' 
+                  ? 'border-green-200 dark:border-green-800 bg-green-50/30 dark:bg-green-950/20' 
+                  : 'border-amber-200 dark:border-amber-800 bg-amber-50/30 dark:bg-amber-950/20'
+              } space-y-5 animate-in slide-in-from-top-2`}>
+                
+                <div className="flex items-center gap-2">
+                  {fetchState === 'found' ? (
+                    <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span className="text-sm font-semibold">Data SSO Ditemukan</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
+                      <AlertCircle className="w-4 h-4" />
+                      <span className="text-sm font-semibold">Data Tidak Ditemukan — Lengkapi Manual</span>
+                    </div>
+                  )}
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider">Nama</p>
-                    <p className="font-semibold">{ssoResult.nama}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider">Unit Kerja</p>
-                    <p className="font-semibold">{ssoResult.unit_kerja}</p>
-                  </div>
-                </div>
-                <div className="flex gap-2 pt-1">
-                  <Button size="sm" onClick={handleAdd} className="gap-1.5">
-                    <Plus className="w-4 h-4" /> Tambahkan
-                  </Button>
-                  <Button size="sm" variant="ghost" onClick={resetForm}>Batal</Button>
-                </div>
-              </div>
-            )}
 
-            {/* SSO Not Found → Manual Input */}
-            {fetchState === 'notfound' && useManual && (
-              <div className="p-4 rounded-xl border-2 border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20 space-y-4">
-                <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
-                  <AlertCircle className="w-4 h-4" />
-                  <span className="text-sm font-semibold">
-                    Badge <span className="font-mono">{badgeInput}</span> tidak ditemukan — isi manual
-                  </span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <Label className="text-xs">Nama Lengkap *</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Nama Lengkap</Label>
                     <Input
-                      placeholder="Nama..."
-                      value={manualForm.nama}
-                      onChange={e => setManualForm(p => ({ ...p, nama: e.target.value }))}
+                      placeholder="Nama Lengkap..."
+                      value={fetchState === 'found' ? ssoResult?.nama : manualForm.nama}
+                      onChange={e => fetchState !== 'found' && setManualForm(p => ({ ...p, nama: e.target.value }))}
+                      readOnly={fetchState === 'found'}
+                      className={fetchState === 'found' ? "bg-muted/50 border-transparent font-medium" : "bg-background"}
                     />
                   </div>
-                  <div className="space-y-1" ref={unitDropdownRef}>
-                    <Label className="text-xs">Unit Kerja *</Label>
+
+                  <div className="space-y-1.5" ref={unitDropdownRef}>
+                    <Label className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Unit Kerja *</Label>
                     <div className="relative">
                       <button
                         type="button"
                         onClick={() => setUnitDropdownOpen(p => !p)}
-                        className={`flex h-9 w-full items-center justify-between rounded-md border px-3 py-1 text-sm shadow-sm transition-colors hover:bg-muted/50 focus:outline-none focus:ring-1 focus:ring-ring ${
-                          manualForm.unit_kerja ? 'border-primary/50 text-foreground' : 'border-input text-muted-foreground'
+                        className={`flex h-10 w-full items-center justify-between rounded-md border px-3 py-2 text-sm shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-primary/20 ${
+                          (fetchState === 'found' ? ssoResult?.unit_kerja : manualForm.unit_kerja) 
+                            ? 'border-primary/30 text-foreground bg-background' 
+                            : 'border-input text-muted-foreground bg-background'
                         }`}
                       >
-                        <span className="truncate">{manualForm.unit_kerja || 'Pilih Unit Kerja'}</span>
-                        <ChevronDown className={`w-4 h-4 shrink-0 ml-2 transition-transform duration-200 ${unitDropdownOpen ? 'rotate-180' : ''}`} />
+                        <span className="truncate">{(fetchState === 'found' ? ssoResult?.unit_kerja : manualForm.unit_kerja) || 'Pilih Unit Kerja'}</span>
+                        <ChevronDown className={`w-4 h-4 shrink-0 ml-2 text-muted-foreground transition-transform duration-200 ${unitDropdownOpen ? 'rotate-180' : ''}`} />
                       </button>
 
                       {unitDropdownOpen && (
                         <div className="absolute z-50 top-full mt-1 left-0 right-0 bg-popover border border-border rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">
-                          <div className="max-h-52 overflow-y-auto">
+                          <div className="max-h-60 overflow-y-auto py-1">
                             {masterUnitKerja.map(uk => (
                               <button
                                 key={uk}
                                 type="button"
                                 onMouseDown={e => {
                                   e.preventDefault()
-                                  setManualForm(p => ({ ...p, unit_kerja: uk }))
+                                  if (fetchState === 'found') {
+                                    setSsoResult(p => p ? { ...p, unit_kerja: uk } : null)
+                                  } else {
+                                    setManualForm(p => ({ ...p, unit_kerja: uk }))
+                                  }
                                   setUnitDropdownOpen(false)
                                 }}
-                                className={`w-full flex items-center justify-between px-3 py-2 text-sm text-left transition-colors hover:bg-muted/60 ${
-                                  manualForm.unit_kerja === uk ? 'bg-primary/10 text-primary font-medium' : ''
+                                className={`w-full flex items-center justify-between px-4 py-2.5 text-sm text-left transition-colors hover:bg-muted/60 ${
+                                  (fetchState === 'found' ? ssoResult?.unit_kerja === uk : manualForm.unit_kerja === uk) 
+                                    ? 'bg-primary/10 text-primary font-semibold' 
+                                    : 'text-foreground'
                                 }`}
                               >
                                 <span>{uk}</span>
-                                {manualForm.unit_kerja === uk && <Check className="w-3.5 h-3.5 shrink-0" />}
+                                {(fetchState === 'found' ? ssoResult?.unit_kerja === uk : manualForm.unit_kerja === uk) && (
+                                  <Check className="w-4 h-4 shrink-0" />
+                                )}
                               </button>
                             ))}
+                            {masterUnitKerja.length === 0 && (
+                              <div className="px-4 py-3 text-xs text-center text-muted-foreground italic">
+                                Belum ada daftar Unit Kerja.<br/>Tambahkan di menu Master Unit Kerja.
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-2 pt-1">
-                  <Button
-                    size="sm"
-                    onClick={handleAdd}
-                    disabled={!manualForm.nama.trim() || !manualForm.unit_kerja.trim()}
-                    className="gap-1.5"
+
+                <div className="flex items-center gap-3 pt-2">
+                  <Button 
+                    onClick={handleAdd} 
+                    className="flex-1 sm:flex-none px-8 font-bold"
+                    disabled={
+                      (fetchState === 'found' && !ssoResult?.unit_kerja) ||
+                      (fetchState === 'notfound' && (!manualForm.nama.trim() || !manualForm.unit_kerja.trim()))
+                    }
                   >
-                    <Plus className="w-4 h-4" /> Tambahkan
+                    <Plus className="w-4 h-4 mr-2" /> 
+                    Tambahkan ke Master
                   </Button>
-                  <Button size="sm" variant="ghost" onClick={resetForm}>Batal</Button>
+                  <Button variant="ghost" onClick={resetForm} className="text-muted-foreground">Batal</Button>
                 </div>
               </div>
             )}

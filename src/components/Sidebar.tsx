@@ -29,7 +29,7 @@ export function Sidebar({ user, currentView, setCurrentView, onLogout }: Sidebar
       )}>
         <div className="flex items-center overflow-hidden">
           <img 
-            src="/Logo Emblem Pusri Dark.svg" 
+            src="/logo-pusri.svg" 
             alt="Pusri" 
             className="w-8 h-8 shrink-0 object-contain drop-shadow-sm" 
           />
@@ -82,22 +82,22 @@ export function Sidebar({ user, currentView, setCurrentView, onLogout }: Sidebar
           title={isCollapsed ? "Riwayat Pengajuan" : ""}
         >
           <FileText className={cn("w-4 h-4", !isCollapsed && "mr-2")} /> 
-          {!isCollapsed && "Riwayat Pengajuan"}
+          {!isCollapsed && "Tamu Karyawan"}
         </Button>
 
         {user.role === 'Sekuriti' && (
           <Button 
-            variant={currentView === 'form_pengantaran' ? 'secondary' : 'ghost'} 
+            variant={currentView === 'table_pengantaran' || currentView === 'form_pengantaran' ? 'secondary' : 'ghost'} 
             className={cn(
               "w-full transition-all duration-200",
               isCollapsed ? "justify-center px-0" : "justify-start",
               !isCollapsed && "pl-8"
             )}
-            onClick={() => setCurrentView('form_pengantaran')}
-            title={isCollapsed ? "Pengantaran" : ""}
+            onClick={() => setCurrentView('table_pengantaran')}
+            title={isCollapsed ? "Tamu Pengantaran" : ""}
           >
             <Package className={cn("w-4 h-4", !isCollapsed && "mr-2")} /> 
-            {!isCollapsed && "Pengantaran"}
+            {!isCollapsed && "Tamu Pengantaran"}
           </Button>
         )}
         
@@ -142,8 +142,7 @@ export function Sidebar({ user, currentView, setCurrentView, onLogout }: Sidebar
             <Button 
               variant={currentView === 'master_pabrik' ? 'secondary' : 'ghost'} 
               className={cn(
-                "w-full transition-all duration-200",
-                isCollapsed ? "justify-center px-0" : "justify-start",
+                "w-full justify-start text-sm h-10 px-3",
                 !isCollapsed && "pl-8"
               )}
               onClick={() => setCurrentView('master_pabrik')}
@@ -152,6 +151,18 @@ export function Sidebar({ user, currentView, setCurrentView, onLogout }: Sidebar
               <Factory className={cn("w-4 h-4", !isCollapsed && "mr-2")} /> 
               {!isCollapsed && "Pabrik"}
             </Button>
+            {/* <Button 
+              variant={currentView === 'master_unit_kerja' ? 'secondary' : 'ghost'} 
+              className={cn(
+                "w-full justify-start text-sm h-10 px-3",
+                !isCollapsed && "pl-8"
+              )}
+              onClick={() => setCurrentView('master_unit_kerja')}
+              title={isCollapsed ? "Unit Kerja" : ""}
+            >
+              <Building className={cn("w-4 h-4", !isCollapsed && "mr-2")} /> 
+              {!isCollapsed && "Unit Kerja"}
+            </Button> */}
             <Button 
               variant={currentView === 'master_tkno' ? 'secondary' : 'ghost'} 
               className={cn(
@@ -160,10 +171,10 @@ export function Sidebar({ user, currentView, setCurrentView, onLogout }: Sidebar
                 !isCollapsed && "pl-8"
               )}
               onClick={() => setCurrentView('master_tkno')}
-              title={isCollapsed ? "Master TKNO" : ""}
+              title={isCollapsed ? "TKNO" : ""}
             >
               <Users className={cn("w-4 h-4", !isCollapsed && "mr-2")} /> 
-              {!isCollapsed && "Master TKNO"}
+              {!isCollapsed && "TKNO"}
             </Button>
           </>
         )}

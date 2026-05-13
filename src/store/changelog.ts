@@ -1,4 +1,4 @@
-export const APP_VERSION = "1.15.6"
+export const APP_VERSION = "1.15.7"
 
 export interface ChangelogEntry {
   version: string
@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  {
+    version: "1.15.7",
+    date: "2026-05-13",
+    type: "patch",
+    description: "Refine KioskPengantaran modals and footer for mobile responsiveness"
+  },
   {
     version: "1.15.6",
     date: "2026-05-08",

@@ -23,7 +23,7 @@ export function MobileHeader({ currentView, setCurrentView, onLogout, user }: Mo
       : []),
     ...(user.role === 'Sekuriti'
       ? [
-          { view: 'form_pengantaran' as ViewType, label: 'Pengantaran', icon: <Package className="w-5 h-5" /> },
+          { view: 'table_pengantaran' as ViewType, label: 'Pengantaran', icon: <Package className="w-5 h-5" /> },
         ]
       : []),
   ]
@@ -34,7 +34,7 @@ export function MobileHeader({ currentView, setCurrentView, onLogout, user }: Mo
       <header className="md:hidden bg-card/60 backdrop-blur-2xl border-b border-border/50 h-14 flex items-center justify-between px-4 shrink-0 z-20">
         <div className="flex items-center gap-2 font-bold">
           <img 
-            src="/Logo Emblem Pusri Dark.svg" 
+            src="/logo-pusri.svg" 
             alt="Logo" 
             className="w-6 h-6 object-contain" 
           />
@@ -111,6 +111,13 @@ export function MobileHeader({ currentView, setCurrentView, onLogout, user }: Mo
                     onClick={() => { setCurrentView('master_pabrik'); setIsMenuOpen(false); }}
                   >
                     <Factory className="w-4 h-4 mr-2" /> Pabrik
+                  </Button>
+                  <Button 
+                    variant={currentView === 'master_unit_kerja' ? 'secondary' : 'ghost'} 
+                    className="w-full justify-start text-sm h-10"
+                    onClick={() => { setCurrentView('master_unit_kerja'); setIsMenuOpen(false); }}
+                  >
+                    <Building className="w-4 h-4 mr-2" /> Unit Kerja
                   </Button>
                   <Button 
                     variant={currentView === 'master_tkno' ? 'secondary' : 'ghost'} 

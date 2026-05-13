@@ -1,10 +1,11 @@
 import { useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { Pengajuan, StatusTamu } from "@/store/types"
-import { Eye, Package, User, CheckSquare } from "lucide-react"
+import { Eye, Package, User, CheckSquare, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
 
 interface TablePengajuanProps {
   data: Pengajuan[];
@@ -22,6 +23,8 @@ export function TablePengajuan({ data, onDetailClick, enableBulkAction, onBulkAp
     status: ''
   })
   const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
   
   const getStatusBadge = (status: StatusTamu) => {
     switch (status) {
@@ -65,6 +68,18 @@ export function TablePengajuan({ data, onDetailClick, enableBulkAction, onBulkAp
 
     return matchKunjungan && matchPj && matchTujuan && matchTamu && matchStatus
   })
+
+  // Pagination Logic
+  const totalItems = filteredData.length
+  const totalPages = Math.ceil(totalItems / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage)
+
+  // Reset to first page when filters change
+  const handleFilterChange = (field: keyof typeof filters, value: string) => {
+    setFilters(prev => ({ ...prev, [field]: value }))
+    setCurrentPage(1)
+  }
 
   const isAllSelected = filteredData.length > 0 && selectedIds.length === filteredData.length;
   const toggleSelectAll = () => {
@@ -129,19 +144,20 @@ export function TablePengajuan({ data, onDetailClick, enableBulkAction, onBulkAp
           <TableRow className="bg-muted/30">
             {enableBulkAction && <TableHead></TableHead>}
             <TableHead></TableHead>
-            <TableHead className="p-2"><Input placeholder="Filter..." value={filters.kunjungan} onChange={(e) => setFilters({...filters, kunjungan: e.target.value})} className="h-8 text-xs font-normal" /></TableHead>
-            <TableHead className="p-2"><Input placeholder="Filter..." value={filters.penanggungJawab} onChange={(e) => setFilters({...filters, penanggungJawab: e.target.value})} className="h-8 text-xs font-normal" /></TableHead>
-            <TableHead className="p-2"><Input placeholder="Filter..." value={filters.tujuan} onChange={(e) => setFilters({...filters, tujuan: e.target.value})} className="h-8 text-xs font-normal" /></TableHead>
-            <TableHead className="p-2"><Input placeholder="Filter..." value={filters.namaTamu} onChange={(e) => setFilters({...filters, namaTamu: e.target.value})} className="h-8 text-xs font-normal" /></TableHead>
-            <TableHead className="p-2"><Input placeholder="Filter..." value={filters.status} onChange={(e) => setFilters({...filters, status: e.target.value})} className="h-8 text-xs font-normal" /></TableHead>
+            <TableHead className="p-2"><Input placeholder="Filter..." value={filters.kunjungan} onChange={(e) => handleFilterChange('kunjungan', e.target.value)} className="h-8 text-xs font-normal" /></TableHead>
+            <TableHead className="p-2"><Input placeholder="Filter..." value={filters.penanggungJawab} onChange={(e) => handleFilterChange('penanggungJawab', e.target.value)} className="h-8 text-xs font-normal" /></TableHead>
+            <TableHead className="p-2"><Input placeholder="Filter..." value={filters.tujuan} onChange={(e) => handleFilterChange('tujuan', e.target.value)} className="h-8 text-xs font-normal" /></TableHead>
+            <TableHead className="p-2"><Input placeholder="Filter..." value={filters.namaTamu} onChange={(e) => handleFilterChange('namaTamu', e.target.value)} className="h-8 text-xs font-normal" /></TableHead>
+            <TableHead className="p-2"><Input placeholder="Filter..." value={filters.status} onChange={(e) => handleFilterChange('status', e.target.value)} className="h-8 text-xs font-normal" /></TableHead>
             <TableHead></TableHead>
             <TableHead></TableHead>
             <TableHead></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredData.length > 0 ? (
-            filteredData.map((item, index) => {
+          {paginatedData.length > 0 ? (
+            paginatedData.map((item, index) => {
+              const displayIndex = startIndex + index + 1;
               return (
                 <TableRow key={item.id} className={selectedIds.includes(item.id) ? "bg-primary/5" : ""}>
                   {enableBulkAction && (
@@ -154,7 +170,7 @@ export function TablePengajuan({ data, onDetailClick, enableBulkAction, onBulkAp
                       />
                     </TableCell>
                   )}
-                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{displayIndex}</TableCell>
                   <TableCell>
                     <div className="font-medium whitespace-nowrap">
                       {formatDate(item.tanggal_waktu)}
@@ -206,6 +222,81 @@ export function TablePengajuan({ data, onDetailClick, enableBulkAction, onBulkAp
           )}
         </TableBody>
       </Table>
+    </div>
+
+    {/* Pagination Controls */}
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2 py-4 mt-2">
+      <div className="flex flex-col sm:flex-row items-center gap-4 order-2 sm:order-1">
+        <div className="text-sm text-muted-foreground">
+          Menampilkan <span className="font-medium text-foreground">{totalItems > 0 ? startIndex + 1 : 0}</span> sampai <span className="font-medium text-foreground">{Math.min(startIndex + itemsPerPage, totalItems)}</span> dari <span className="font-medium text-foreground">{totalItems}</span> data
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground whitespace-nowrap">Baris per halaman:</span>
+          <Select
+            value={itemsPerPage.toString()}
+            onValueChange={(val) => {
+              setItemsPerPage(parseInt(val))
+              setCurrentPage(1)
+            }}
+          >
+            <SelectTrigger className="h-8 w-[70px] text-xs font-medium">
+              <SelectValue placeholder={itemsPerPage.toString()} />
+            </SelectTrigger>
+            <SelectContent>
+              {[5, 10, 25, 50, 100].map((size) => (
+                <SelectItem key={size} value={size.toString()} className="text-xs">
+                  {size}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      
+      <div className="flex items-center gap-1 order-1 sm:order-2">
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-8 w-8 hidden sm:flex"
+          onClick={() => setCurrentPage(1)}
+          disabled={currentPage === 1}
+        >
+          <ChevronsLeft className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-8 w-8"
+          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        
+        <div className="flex items-center gap-1 px-4 min-w-[120px] justify-center">
+          <span className="text-sm font-medium">Hal. {currentPage} / {totalPages || 1}</span>
+        </div>
+
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-8 w-8"
+          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages || totalPages <= 1}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-8 w-8 hidden sm:flex"
+          onClick={() => setCurrentPage(totalPages)}
+          disabled={currentPage === totalPages || totalPages <= 1}
+        >
+          <ChevronsRight className="h-4 w-4" />
+        </Button>
+      </div>
     </div>
   </div>
   )

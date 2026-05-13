@@ -12,6 +12,7 @@ interface LoginProps {
   onLogin: (role: Role, pegawai?: Pegawai) => void;
   onUnauthorized: (badge: string) => void;
   masterTkno?: TknoEntry[];
+  onOpenKiosk?: () => void;
 }
 
 // TKO accounts — badge berawalan 6
@@ -24,7 +25,7 @@ const TKO_ACCOUNTS = [
 
 const DEFAULT_PASSWORD = '12345678';
 
-export function Login({ onLogin, onUnauthorized, masterTkno = initialMasterTkno }: LoginProps) {
+export function Login({ onLogin, onUnauthorized, masterTkno = initialMasterTkno, onOpenKiosk }: LoginProps) {
   const [badge, setBadge] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -93,7 +94,7 @@ export function Login({ onLogin, onUnauthorized, masterTkno = initialMasterTkno 
         <div className="z-10 flex flex-col items-center text-center">
           <div className="mb-8 p-1">
             <img 
-              src="/Logo Emblem Pusri Dark.svg" 
+              src="/logo-pusri.svg" 
               alt="Pusri Logo" 
               className="w-32 h-32 lg:w-40 lg:h-40 object-contain drop-shadow-2xl animate-in zoom-in duration-700" 
             />
@@ -117,7 +118,7 @@ export function Login({ onLogin, onUnauthorized, masterTkno = initialMasterTkno 
           {/* Mobile Logo */}
           <div className="md:hidden flex flex-col items-center mb-8">
             <img 
-              src="/Logo Emblem Pusri Dark.svg" 
+              src="/logo-pusri.svg" 
               alt="Pusri Logo" 
               className="w-20 h-20 object-contain mb-4" 
             />
@@ -235,6 +236,34 @@ export function Login({ onLogin, onUnauthorized, masterTkno = initialMasterTkno 
                 </div>
               )}
             </div>
+
+            {/* Kiosk button — for testing, will be replaced by QR code */}
+            <div className="relative flex items-center py-2">
+              <div className="flex-grow border-t border-border"></div>
+              <span className="flex-shrink-0 mx-4 text-xs text-muted-foreground uppercase tracking-widest">Pengantaran</span>
+              <div className="flex-grow border-t border-border"></div>
+            </div>
+
+            <button
+              type="button"
+              onClick={onOpenKiosk}
+              className="w-full flex items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 hover:bg-primary/10 hover:border-primary/60 transition-all px-4 py-3.5 group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-primary/15 group-hover:bg-primary/25 transition-colors">
+                  <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                  </svg>
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-foreground">Form Pengantaran dan Kunjungan</p>
+                  <p className="text-xs text-muted-foreground">Gojek / Kurir / Paket</p>
+                </div>
+              </div>
+              <svg className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+            </button>
           </div>
         </div>
 

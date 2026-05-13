@@ -7,17 +7,19 @@ import { DetailPengajuan } from './components/DetailPengajuan'
 import { MasterDataView } from './components/MasterDataView'
 import { MasterTknoView } from './components/MasterTknoView'
 import { UnauthorizedView } from './components/UnauthorizedView'
+import { KioskPengantaran } from './components/KioskPengantaran'
 import { Sidebar } from './components/Sidebar'
 import { MobileHeader } from './components/MobileHeader'
 import { LogoutConfirmModal } from './components/LogoutConfirmModal'
+import { ExportRecapModal } from './components/ExportRecapModal'
 import type { StatusTamu, Role, Pegawai, Pengajuan } from './store/types'
 import { Button } from './components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from './components/ui/tabs'
-import { Plus } from 'lucide-react'
+import { Plus, FileSpreadsheet } from 'lucide-react'
 import { Toaster } from '@/components/ui/sonner'
 import { toast } from 'sonner'
 import { useAppStore } from './store/useAppStore'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 function App() {
   const {
@@ -30,6 +32,7 @@ function App() {
     rawPengajuanList,
     masterPerkantoran,
     masterPabrik,
+    masterUnitKerja,
     masterTkno,
     setActiveTab,
     setCurrentView,
@@ -37,6 +40,7 @@ function App() {
     handleLogin,
     handleLogout,
     handleAddPengajuan,
+    handleAddKioskPengantaran,
     handleCheckIn,
     handleCheckOut,
     handleApprove,
@@ -48,7 +52,17 @@ function App() {
   } = useAppStore()
 
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false)
   const [unauthorizedBadge, setUnauthorizedBadge] = useState<string | null>(null)
+  const [isKioskMode, setIsKioskMode] = useState(false)
+
+  // Detect kiosk mode from URL for future QR code access
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('kiosk') === 'true') {
+      setIsKioskMode(true)
+    }
+  }, [])
 
   const onLogin = (role: Role, pegawai?: Pegawai) => {
     handleLogin(role, pegawai)
@@ -71,7 +85,7 @@ function App() {
   }
 
   const onCheckIn = (pengajuanId: string, tamuId: string, noBadge: string) => {
-    handleCheckIn(pengajuanId, tamuId, noBadge)
+    handleCheckIn(pengajuanId, tamuId, noBadge, user?.pegawai)
     toast.success(`Tamu berhasil check-in dengan badge ${noBadge}`)
   }
 
@@ -91,6 +105,26 @@ function App() {
     toast.success(`${pengajuanIds.length} pengajuan berhasil disetujui`)
   }
 
+  const onExportRecap = () => {
+    console.log("Opening Export Modal...")
+    setIsExportModalOpen(true)
+  }
+
+  // Kiosk mode — bypass login entirely
+  if (isKioskMode) {
+    return (
+      <>
+        <KioskPengantaran
+          onSubmit={(pengajuan) => {
+            handleAddKioskPengantaran(pengajuan)
+          }}
+          onBackToLogin={() => setIsKioskMode(false)}
+        />
+        <Toaster theme="dark" richColors position="top-right" />
+      </>
+    )
+  }
+
   if (unauthorizedBadge) {
     return (
       <>
@@ -107,6 +141,7 @@ function App() {
           onLogin={onLogin}
           onUnauthorized={(badge) => setUnauthorizedBadge(badge)}
           masterTkno={masterTkno}
+          onOpenKiosk={() => setIsKioskMode(true)}
         />
         <Toaster theme="dark" richColors position="top-right" />
       </>
@@ -157,13 +192,14 @@ function App() {
               />
             )}
 
-            {(currentView === 'form' || currentView === 'form_pengantaran' || currentView === 'table' || currentView === 'approval') && (
+            {(currentView === 'form' || currentView === 'form_pengantaran' || currentView === 'table' || currentView === 'table_pengantaran' || currentView === 'approval') && (
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
                   <h2 className="text-2xl font-bold">
                     {currentView === 'form' ? 'Buat Pengajuan Baru' : 
                      currentView === 'form_pengantaran' ? 'Form Pengantaran' :
-                     currentView === 'approval' ? 'Butuh Approve' : 'Riwayat Pengajuan'}
+                     currentView === 'approval' ? 'Butuh Approve' : 
+                     currentView === 'table_pengantaran' ? 'Riwayat Pengantaran' : 'Riwayat Pengajuan'}
                   </h2>
                   <p className="text-muted-foreground mt-1 text-sm">
                     {currentView === 'form' 
@@ -172,6 +208,8 @@ function App() {
                       ? 'Isi data pengantaran (Gojek/Paket dll) di bawah ini.'
                       : currentView === 'approval'
                       ? 'Daftar pengajuan tamu yang membutuhkan persetujuan Anda.'
+                      : currentView === 'table_pengantaran'
+                      ? 'Pantau status pengantaran (Gojek, Paket, dll) di lingkungan pabrik.'
                       : `Pantau status kunjungan tamu ${user.role === 'Pegawai' ? 'Anda' : 'di lingkungan pabrik'}.`
                     }
                   </p>
@@ -181,15 +219,21 @@ function App() {
                   {(currentView === 'form' || currentView === 'form_pengantaran') && (
                     <Button 
                       variant="outline"
-                      onClick={() => setCurrentView('table')}
+                      onClick={() => setCurrentView(currentView === 'form' ? 'table' : 'table_pengantaran')}
                     >
                       Batal
                     </Button>
                   )}
-                  {(currentView === 'table' || currentView === 'approval') && (
-                    <Button onClick={() => setCurrentView('form')}>
-                      <Plus className="w-4 h-4 mr-2" /> Pengajuan Baru
-                    </Button>
+                  {(currentView === 'table' || currentView === 'table_pengantaran' || currentView === 'approval') && (
+                    <>
+                      <Button variant="outline" onClick={onExportRecap}>
+                        <FileSpreadsheet className="w-4 h-4 mr-2" /> Rekapan
+                      </Button>
+                      <Button onClick={() => setCurrentView(currentView === 'table_pengantaran' ? 'form_pengantaran' : 'form')}>
+                        <Plus className="w-4 h-4 mr-2" /> 
+                        {currentView === 'table_pengantaran' ? 'Pengantaran Baru' : 'Pengajuan Baru'}
+                      </Button>
+                    </>
                   )}
                 </div>
               </div>
@@ -214,7 +258,7 @@ function App() {
                   role={user.role} 
                   currentUser={user.pegawai} 
                   onSubmit={onAddPengajuan} 
-                  onCancel={() => setCurrentView('table')} 
+                  onCancel={() => setCurrentView('table_pengantaran')} 
                 />
               </div>
             )}
@@ -237,15 +281,25 @@ function App() {
               />
             )}
 
+            {currentView === 'master_unit_kerja' && (
+              <MasterDataView 
+                title="Unit Kerja"
+                data={masterUnitKerja}
+                onAdd={(v) => addMasterData('unit_kerja', v)}
+                onRemove={(v) => removeMasterData('unit_kerja', v)}
+              />
+            )}
+
             {currentView === 'master_tkno' && (
               <MasterTknoView
                 data={masterTkno}
+                masterUnitKerja={masterUnitKerja}
                 onAdd={addTkno}
                 onRemove={removeTkno}
               />
             )}
 
-            {currentView === 'table' && (
+            {(currentView === 'table' || currentView === 'table_pengantaran') && (
               <div className="space-y-4 animate-in fade-in duration-500">
                 <Tabs 
                   value={activeTab} 
@@ -261,7 +315,7 @@ function App() {
                     <TabsTrigger value="checkout" className="shrink-0">Check-Out</TabsTrigger>
                   </TabsList>
                 </Tabs>
-
+                
                 <TablePengajuan 
                   data={filteredPengajuan} 
                   onDetailClick={setSelectedPengajuanId} 
@@ -301,6 +355,12 @@ function App() {
         isOpen={isLogoutModalOpen}
         onClose={() => setIsLogoutModalOpen(false)}
         onConfirm={confirmLogout}
+      />
+      <ExportRecapModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        data={filteredPengajuan}
+        title={currentView === 'table_pengantaran' ? 'Tamu Pengantaran' : 'Tamu Karyawan'}
       />
       <Toaster theme="dark" richColors position="top-right" />
     </div>

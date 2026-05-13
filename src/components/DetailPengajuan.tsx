@@ -79,11 +79,23 @@ export function DetailPengajuan({ pengajuan, role, isOpen, onClose, onCheckIn, o
         <div className="grid md:grid-cols-2 gap-6 my-4">
           <div className="space-y-4">
             <h4 className="font-semibold text-sm text-muted-foreground uppercase">Data Penanggung Jawab</h4>
-            <div className="bg-muted/30 p-3 rounded-md text-sm border">
-              <p><span className="font-medium">Nama:</span> {pengajuan.penanggung_jawab.nama}</p>
-              <p><span className="font-medium">Unit Kerja:</span> {pengajuan.penanggung_jawab.unit_kerja}</p>
-              <p><span className="font-medium">No. Badge:</span> {pengajuan.penanggung_jawab.no_badge}</p>
-            </div>
+            {pengajuan.penanggung_jawab.id === 0 ? (
+              <div className="bg-amber-500/10 border border-amber-500/30 p-3 rounded-md text-sm flex items-start gap-2">
+                <svg className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                </svg>
+                <div>
+                  <p className="font-semibold text-amber-600 dark:text-amber-400">Entri Kiosk Mandiri</p>
+                  <p className="text-muted-foreground text-xs mt-0.5">Penanggung jawab akan otomatis terisi dengan data Sekuriti yang melakukan Check-In.</p>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-muted/30 p-3 rounded-md text-sm border">
+                <p><span className="font-medium">Nama:</span> {pengajuan.penanggung_jawab.nama}</p>
+                <p><span className="font-medium">Unit Kerja:</span> {pengajuan.penanggung_jawab.unit_kerja}</p>
+                <p><span className="font-medium">No. Badge:</span> {pengajuan.penanggung_jawab.no_badge}</p>
+              </div>
+            )}
           </div>
           <div className="space-y-4">
             <h4 className="font-semibold text-sm text-muted-foreground uppercase">Tujuan Kunjungan</h4>
