@@ -45,7 +45,7 @@ export function MobileHeader({ currentView, setCurrentView, onLogout, user }: Mo
         </div>
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <span className="truncate max-w-[120px]">
-            {user.role !== 'Sekuriti' ? user.pegawai?.nama : 'Petugas Sekuriti'}
+            {user.pegawai?.nama || 'Petugas Sekuriti'}
           </span>
         </div>
       </header>

@@ -1,4 +1,4 @@
-export const APP_VERSION = "1.16.1"
+export const APP_VERSION = "1.16.3"
 
 export interface ChangelogEntry {
   version: string
@@ -8,6 +8,18 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  {
+    version: "1.16.3",
+    date: "2026-05-13",
+    type: "patch",
+    description: "Update sidebar user sub-text to display Unit Kerja with VP/SVP prefixes"
+  },
+  {
+    version: "1.16.2",
+    date: "2026-05-13",
+    type: "patch",
+    description: "Fix user name display for Sekuriti role to show actual profile name"
+  },
   {
     version: "1.16.1",
     date: "2026-05-13",

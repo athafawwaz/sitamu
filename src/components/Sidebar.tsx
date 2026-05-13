@@ -173,12 +173,15 @@ export function Sidebar({ user, currentView, setCurrentView, onLogout }: Sidebar
         <div className={cn("mb-4", isCollapsed ? "flex justify-center" : "px-2")}>
           {!isCollapsed ? (
             <>
-              <p className="font-semibold text-sm truncate">{user.role !== 'Sekuriti' ? user.pegawai?.nama : 'Petugas Sekuriti'}</p>
-              <p className="text-xs text-muted-foreground">{user.role === 'SVP_Operasi' ? 'SVP Operasi' : user.role}</p>
+              <p className="font-semibold text-sm truncate">{user.pegawai?.nama || 'Petugas Sekuriti'}</p>
+              <p className="text-xs text-muted-foreground">
+                {user.role === 'VP' ? 'VP ' : user.role === 'SVP_Operasi' ? 'SVP ' : ''}
+                {user.pegawai?.unit_kerja || (user.role === 'Sekuriti' ? 'Sekuriti' : user.role)}
+              </p>
             </>
           ) : (
             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
-              {user.role !== 'Sekuriti' ? user.pegawai?.nama.charAt(0) : 'S'}
+              {user.pegawai?.nama ? user.pegawai.nama.charAt(0) : 'S'}
             </div>
           )}
         </div>
