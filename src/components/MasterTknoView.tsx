@@ -271,12 +271,12 @@ export function MasterTknoView({ data, onAdd, onRemove }: MasterTknoViewProps) {
                   {fetchState === 'found' ? (
                     <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
                       <CheckCircle2 className="w-4 h-4" />
-                      <span className="text-sm font-semibold">Data SSO Ditemukan</span>
+                      <span className="text-sm font-semibold">Data TKNO Ditemukan</span>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
                       <AlertCircle className="w-4 h-4" />
-                      <span className="text-sm font-semibold">Data Tidak Ditemukan — Lengkapi Manual</span>
+                      <span className="text-sm font-semibold">Data TKNO Tidak Ditemukan — Lengkapi Manual</span>
                     </div>
                   )}
                 </div>

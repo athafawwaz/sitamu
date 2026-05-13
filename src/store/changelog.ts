@@ -1,4 +1,4 @@
-export const APP_VERSION = "1.16.0"
+export const APP_VERSION = "1.16.1"
 
 export interface ChangelogEntry {
   version: string
@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  {
+    version: "1.16.1",
+    date: "2026-05-13",
+    type: "patch",
+    description: "Fix capitalization in MasterTknoView and update backend prompt template for Go/Fiber"
+  },
   {
     version: "1.16.0",
     date: "2026-05-13",
