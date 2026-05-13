@@ -32,7 +32,6 @@ function App() {
     rawPengajuanList,
     masterPerkantoran,
     masterPabrik,
-    masterUnitKerja,
     masterTkno,
     setActiveTab,
     setCurrentView,
@@ -281,19 +280,11 @@ function App() {
               />
             )}
 
-            {currentView === 'master_unit_kerja' && (
-              <MasterDataView 
-                title="Unit Kerja"
-                data={masterUnitKerja}
-                onAdd={(v) => addMasterData('unit_kerja', v)}
-                onRemove={(v) => removeMasterData('unit_kerja', v)}
-              />
-            )}
+
 
             {currentView === 'master_tkno' && (
               <MasterTknoView
                 data={masterTkno}
-                masterUnitKerja={masterUnitKerja}
                 onAdd={addTkno}
                 onRemove={removeTkno}
               />

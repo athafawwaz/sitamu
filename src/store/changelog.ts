@@ -1,4 +1,4 @@
-export const APP_VERSION = "1.15.7"
+export const APP_VERSION = "1.16.0"
 
 export interface ChangelogEntry {
   version: string
@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  {
+    version: "1.16.0",
+    date: "2026-05-13",
+    type: "minor",
+    description: "Refactor Unit Kerja to use static dummy data and remove Master Unit Kerja management view"
+  },
   {
     version: "1.15.7",
     date: "2026-05-13",

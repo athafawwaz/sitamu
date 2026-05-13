@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import type { Pegawai, Pengajuan, Role, StatusTamu, TknoEntry, ViewType } from './types'
-import { initialPengajuan, masterPerkantoran as initialMasterPerkantoran, masterPabrik as initialMasterPabrik, initialMasterTkno, masterUnitKerja as initialMasterUnitKerja } from './data'
+import { initialPengajuan, masterPerkantoran as initialMasterPerkantoran, masterPabrik as initialMasterPabrik, initialMasterTkno } from './data'
 
 export function useAppStore() {
   const [user, setUser] = useState<{ role: Role, pegawai?: Pegawai } | null>(null)
@@ -11,7 +11,6 @@ export function useAppStore() {
   
   const [masterPerkantoran, setMasterPerkantoran] = useState<string[]>(initialMasterPerkantoran)
   const [masterPabrik, setMasterPabrik] = useState<string[]>(initialMasterPabrik)
-  const [masterUnitKerja, setMasterUnitKerja] = useState<string[]>(initialMasterUnitKerja)
   const [masterTkno, setMasterTkno] = useState<TknoEntry[]>(initialMasterTkno)
 
   // Load from local storage
@@ -44,14 +43,6 @@ export function useAppStore() {
       } catch(e) {}
     }
 
-    const savedUnitKerja = localStorage.getItem('masterUnitKerja')
-    if (savedUnitKerja) {
-      try {
-        const parsed = JSON.parse(savedUnitKerja)
-        if (parsed && parsed.length > 0) setMasterUnitKerja(parsed)
-      } catch(e) {}
-    }
-
     const savedTkno = localStorage.getItem('masterTkno')
     if (savedTkno) {
       try {
@@ -72,10 +63,6 @@ export function useAppStore() {
   useEffect(() => {
     localStorage.setItem('masterPabrik', JSON.stringify(masterPabrik))
   }, [masterPabrik])
-
-  useEffect(() => {
-    localStorage.setItem('masterUnitKerja', JSON.stringify(masterUnitKerja))
-  }, [masterUnitKerja])
 
   useEffect(() => {
     localStorage.setItem('masterTkno', JSON.stringify(masterTkno))
@@ -199,23 +186,19 @@ export function useAppStore() {
     }))
   }
 
-  const addMasterData = (type: 'perkantoran' | 'pabrik' | 'unit_kerja', value: string) => {
+  const addMasterData = (type: 'perkantoran' | 'pabrik', value: string) => {
     if (type === 'perkantoran') {
       setMasterPerkantoran(prev => [...prev, value])
     } else if (type === 'pabrik') {
       setMasterPabrik(prev => [...prev, value])
-    } else {
-      setMasterUnitKerja(prev => [...prev, value])
     }
   }
 
-  const removeMasterData = (type: 'perkantoran' | 'pabrik' | 'unit_kerja', value: string) => {
+  const removeMasterData = (type: 'perkantoran' | 'pabrik', value: string) => {
     if (type === 'perkantoran') {
       setMasterPerkantoran(prev => prev.filter(v => v !== value))
     } else if (type === 'pabrik') {
       setMasterPabrik(prev => prev.filter(v => v !== value))
-    } else {
-      setMasterUnitKerja(prev => prev.filter(v => v !== value))
     }
   }
 
@@ -263,7 +246,6 @@ export function useAppStore() {
     rawPengajuanList,
     masterPerkantoran,
     masterPabrik,
-    masterUnitKerja,
     masterTkno,
     setActiveTab,
     setCurrentView,

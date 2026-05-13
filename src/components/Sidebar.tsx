@@ -151,18 +151,7 @@ export function Sidebar({ user, currentView, setCurrentView, onLogout }: Sidebar
               <Factory className={cn("w-4 h-4", !isCollapsed && "mr-2")} /> 
               {!isCollapsed && "Pabrik"}
             </Button>
-            {/* <Button 
-              variant={currentView === 'master_unit_kerja' ? 'secondary' : 'ghost'} 
-              className={cn(
-                "w-full justify-start text-sm h-10 px-3",
-                !isCollapsed && "pl-8"
-              )}
-              onClick={() => setCurrentView('master_unit_kerja')}
-              title={isCollapsed ? "Unit Kerja" : ""}
-            >
-              <Building className={cn("w-4 h-4", !isCollapsed && "mr-2")} /> 
-              {!isCollapsed && "Unit Kerja"}
-            </Button> */}
+
             <Button 
               variant={currentView === 'master_tkno' ? 'secondary' : 'ghost'} 
               className={cn(

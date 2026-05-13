@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Trash2, Plus, Users, Search, Loader2, CheckCircle2, AlertCircle, ChevronDown, Check } from "lucide-react"
 import type { TknoEntry } from "@/store/types"
+import { DUMMY_UNIT_KERJA } from "@/store/data"
 
 // Seluruh database SSO — untuk suggestions + fetch
 const SSO_DATABASE: Record<string, Omit<TknoEntry, 'id'>> = {
@@ -35,12 +36,11 @@ function mockSsoSearch(query: string): Omit<TknoEntry, 'id'>[] {
 
 interface MasterTknoViewProps {
   data: TknoEntry[]
-  masterUnitKerja: string[]
   onAdd: (entry: TknoEntry) => void
   onRemove: (id: string) => void
 }
 
-export function MasterTknoView({ data, masterUnitKerja, onAdd, onRemove }: MasterTknoViewProps) {
+export function MasterTknoView({ data, onAdd, onRemove }: MasterTknoViewProps) {
   const [badgeInput, setBadgeInput] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [ssoResult, setSsoResult] = useState<Omit<TknoEntry, 'id'> | null>(null)
@@ -312,7 +312,7 @@ export function MasterTknoView({ data, masterUnitKerja, onAdd, onRemove }: Maste
                       {unitDropdownOpen && (
                         <div className="absolute z-50 top-full mt-1 left-0 right-0 bg-popover border border-border rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">
                           <div className="max-h-60 overflow-y-auto py-1">
-                            {masterUnitKerja.map(uk => (
+                            {DUMMY_UNIT_KERJA.map(uk => (
                               <button
                                 key={uk}
                                 type="button"
@@ -337,11 +337,6 @@ export function MasterTknoView({ data, masterUnitKerja, onAdd, onRemove }: Maste
                                 )}
                               </button>
                             ))}
-                            {masterUnitKerja.length === 0 && (
-                              <div className="px-4 py-3 text-xs text-center text-muted-foreground italic">
-                                Belum ada daftar Unit Kerja.<br/>Tambahkan di menu Master Unit Kerja.
-                              </div>
-                            )}
                           </div>
                         </div>
                       )}

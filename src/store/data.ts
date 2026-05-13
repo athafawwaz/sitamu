@@ -92,7 +92,7 @@ export const initialMasterTkno: TknoEntry[] = [
   { id: 'tkno-5', no_badge: '5080001', nama: 'Bambang Setiawan',  unit_kerja: 'Departemen Engineering',  jabatan: 'Staff' },
 ];
 
-export const masterUnitKerja: string[] = [
+export const DUMMY_UNIT_KERJA: string[] = [
   'Departemen Produksi',
   'Departemen Utilitas',
   'Departemen Pemeliharaan',

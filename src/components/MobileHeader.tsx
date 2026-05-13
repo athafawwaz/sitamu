@@ -112,13 +112,7 @@ export function MobileHeader({ currentView, setCurrentView, onLogout, user }: Mo
                   >
                     <Factory className="w-4 h-4 mr-2" /> Pabrik
                   </Button>
-                  <Button 
-                    variant={currentView === 'master_unit_kerja' ? 'secondary' : 'ghost'} 
-                    className="w-full justify-start text-sm h-10"
-                    onClick={() => { setCurrentView('master_unit_kerja'); setIsMenuOpen(false); }}
-                  >
-                    <Building className="w-4 h-4 mr-2" /> Unit Kerja
-                  </Button>
+
                   <Button 
                     variant={currentView === 'master_tkno' ? 'secondary' : 'ghost'} 
                     className="w-full justify-start text-sm h-10"
