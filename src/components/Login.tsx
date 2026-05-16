@@ -100,10 +100,10 @@ export function Login({ onLogin, onUnauthorized, masterTkno = initialMasterTkno,
             />
           </div>
           <h1 className="text-4xl lg:text-5xl font-bold text-white tracking-tight mb-4">
-            SI TAMU
+            Vistara
           </h1>
           <p className="text-lg text-slate-300 font-medium tracking-wide mb-2">
-            Sistem Informasi Tamu
+            Setiap kunjungan, dalam genggaman Anda.
           </p>
           <p className="text-sm text-slate-400 max-w-sm mx-auto">
             PT Pupuk Sriwidjaja Palembang<br/>
@@ -122,7 +122,7 @@ export function Login({ onLogin, onUnauthorized, masterTkno = initialMasterTkno,
               alt="Pusri Logo" 
               className="w-20 h-20 object-contain mb-4" 
             />
-            <h1 className="text-2xl font-bold tracking-tight">SI TAMU</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Vistara</h1>
           </div>
 
           <div className="space-y-8">
@@ -269,7 +269,7 @@ export function Login({ onLogin, onUnauthorized, masterTkno = initialMasterTkno,
 
         {/* Footer */}
         <div className="mt-auto pt-8 pb-2 md:pb-0 text-center w-full px-6 text-xs text-muted-foreground">
-          <p>Sistem Informasi Tamu v{APP_VERSION} &mdash; PT Pupuk Sriwidjaja Palembang</p>
+          <p>Vistara v{APP_VERSION} &mdash; PT Pupuk Sriwidjaja Palembang</p>
         </div>
       </div>
     </div>

@@ -42,14 +42,14 @@ export function Dashboard({ role, pegawai, pengajuanList, onNavigateToForm, onNa
       <CardContent className="p-8 md:p-10 relative z-10">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-medium text-primary mb-6 backdrop-blur-sm">
           <Sparkles className="w-3.5 h-3.5" />
-          SI TAMU — PT. Pupuk Sriwidjaja Palembang
+          Vistara — PT. Pupuk Sriwidjaja Palembang
         </div>
         
         <h2 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight">
           {greeting}, {userName}
         </h2>
         <p className="text-muted-foreground max-w-2xl text-base md:text-lg mb-8 leading-relaxed">
-          Sistem Manajemen Kedatangan Tamu terpadu untuk mengelola jadwal kunjungan, registrasi tamu, dan administrasi keamanan perusahaan.
+          Setiap kunjungan, dalam genggaman Anda.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 text-sm text-muted-foreground mb-8">

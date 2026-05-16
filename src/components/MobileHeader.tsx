@@ -39,7 +39,7 @@ export function MobileHeader({ currentView, setCurrentView, onLogout, user }: Mo
             className="w-6 h-6 object-contain" 
           />
           <div className="flex flex-col leading-none">
-            <span className="text-sm font-bold">SI TAMU</span>
+            <span className="text-sm font-bold">Vistara</span>
             <span className="text-[9px] text-primary font-mono font-normal">v{APP_VERSION}</span>
           </div>
         </div>

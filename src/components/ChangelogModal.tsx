@@ -33,7 +33,7 @@ export function ChangelogModal({ isOpen, onClose }: ChangelogModalProps) {
             <div>
               <DialogTitle className="text-xl font-bold tracking-tight">Riwayat Pembaruan</DialogTitle>
               <DialogDescription className="text-muted-foreground text-xs mt-0.5">
-                SI TAMU — Evolusi & Peningkatan Sistem
+                Vistara — Evolusi & Peningkatan Sistem
               </DialogDescription>
             </div>
           </div>

@@ -34,7 +34,7 @@ export function Sidebar({ user, currentView, setCurrentView, onLogout }: Sidebar
             className="w-8 h-8 shrink-0 object-contain drop-shadow-sm" 
           />
           {!isCollapsed && (
-            <h1 className="text-lg font-bold tracking-tight text-primary ml-3 truncate">SI TAMU</h1>
+            <h1 className="text-lg font-bold tracking-tight text-primary ml-3 truncate">Vistara</h1>
           )}
         </div>
         <Button 

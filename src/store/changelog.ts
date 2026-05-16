@@ -1,4 +1,4 @@
-export const APP_VERSION = "1.16.3"
+export const APP_VERSION = "1.16.4"
 
 export interface ChangelogEntry {
   version: string
@@ -8,6 +8,12 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
+  {
+    version: "1.16.4",
+    date: "2026-05-16",
+    type: "patch",
+    description: "Update Privacy & Consent Modal content in KioskPengantaran to match official document"
+  },
   {
     version: "1.16.3",
     date: "2026-05-13",

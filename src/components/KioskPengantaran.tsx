@@ -249,7 +249,7 @@ export function KioskPengantaran({ onSubmit, onBackToLogin }: KioskPengantaranPr
       {/* Data Protection Consent Modal */}
       {showConsentModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-background/90 backdrop-blur-md p-4 animate-in fade-in duration-500">
-          <Card className="max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border-primary/20 animate-in zoom-in-95 slide-in-from-bottom-10 duration-500">
+          <Card className="max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-primary/20 animate-in zoom-in-95 slide-in-from-bottom-10 duration-500">
             <div className="bg-primary h-1.5 w-full sticky top-0 z-10" />
             <CardHeader className="text-center pt-6 sm:pt-8 px-4">
               <div className="flex justify-center mb-4">
@@ -257,25 +257,47 @@ export function KioskPengantaran({ onSubmit, onBackToLogin }: KioskPengantaranPr
                   <ShieldCheck className="w-8 h-8 sm:w-10 sm:h-10" />
                 </div>
               </div>
-              <CardTitle className="text-xl sm:text-2xl font-bold leading-tight">Pernyataan Privasi & Perlindungan Data</CardTitle>
+              <CardTitle className="text-xl sm:text-2xl font-bold leading-tight uppercase">B. Pernyataan dan Persetujuan Tamu</CardTitle>
             </CardHeader>
-            <CardContent className="px-5 sm:px-8 pb-2 space-y-4 text-sm text-muted-foreground leading-relaxed">
-              <p>
-                Sebelum melanjutkan pendaftaran pengantaran mandiri, mohon baca dan setujui pernyataan perlindungan data berikut:
-              </p>
-              <ul className="space-y-3 list-disc pl-4 italic">
-                <li>
-                  Data pribadi yang Anda masukkan (Nama, No. HP, Instansi) hanya digunakan untuk keperluan pencatatan kunjungan dan verifikasi keamanan di lingkungan PT Pupuk Sriwidjaja Palembang.
-                </li>
-                <li>
-                  Data Anda akan disimpan secara aman dalam sistem internal kami dan tidak akan dibagikan kepada pihak ketiga tanpa izin, sesuai dengan regulasi perlindungan data yang berlaku.
-                </li>
-                <li>
-                  Dengan menekan tombol setuju, Anda menyatakan bahwa data yang diberikan adalah benar dan akurat.
-                </li>
-              </ul>
-              <div className="bg-muted/50 p-3 rounded-lg border text-[11px]">
-                <p>Aplikasi ini mematuhi standar keamanan data perusahaan untuk menjamin kerahasiaan informasi pengunjung.</p>
+            <CardContent className="px-5 sm:px-8 pb-4 space-y-4 text-sm text-foreground/80 leading-relaxed">
+              <div className="text-xs sm:text-sm space-y-4">
+                <p className="font-medium">Dengan ini saya menyatakan bahwa:</p>
+                <ol className="space-y-4 list-decimal pl-5">
+                  <li>
+                    Saya secara sadar dan sukarela menitipkan dokumen identitas pribadi kepada pihak pengelola/penerima tamu sebagai salah satu persyaratan akses masuk kawasan.
+                  </li>
+                  <li>
+                    Dokumen identitas yang dititipkan hanya digunakan untuk:
+                    <ul className="list-disc pl-5 mt-2 space-y-1">
+                      <li>Verifikasi identitas pengunjung;</li>
+                      <li>Keamanan dan pengendalian akses kawasan;</li>
+                      <li>Pencatatan administrasi kunjungan.</li>
+                    </ul>
+                  </li>
+                  <li>
+                    Pihak pengelola/penerima tamu berkomitmen menjaga kerahasiaan dan keamanan data pribadi sesuai ketentuan yang berlaku.
+                  </li>
+                  <li>
+                    Saya memahami bahwa:
+                    <ul className="list-disc pl-5 mt-2 space-y-1">
+                      <li>Dokumen identitas tidak akan digunakan untuk kepentingan lain di luar proses keamanan dan administrasi kunjungan;</li>
+                      <li>Dokumen identitas tidak akan diperbanyak, disebarluaskan, atau dipindahtangankan tanpa persetujuan saya, kecuali diwajibkan oleh peraturan perundang-undangan atau permintaan resmi aparat berwenang.</li>
+                    </ul>
+                  </li>
+                  <li>
+                    Saya melepaskan pihak pengelola kawasan, perusahaan, serta tuan rumah/PIC dari tuntutan hukum atas dugaan penyalahgunaan data pribadi sepanjang:
+                    <ul className="list-disc pl-5 mt-2 space-y-1">
+                      <li>Pengelolaan data dilakukan sesuai prosedur keamanan yang wajar;</li>
+                      <li>Tidak terdapat unsur kesengajaan, kelalaian berat, atau tindakan melawan hukum dari pihak pengelola.</li>
+                    </ul>
+                  </li>
+                  <li>
+                    Apabila terjadi kehilangan, kerusakan, atau penyalahgunaan akibat kelalaian atau tindakan pihak lain di luar kendali wajar pengelola, maka penyelesaian akan dilakukan sesuai ketentuan hukum yang berlaku.
+                  </li>
+                  <li>
+                    Saya telah membaca, memahami, dan menyetujui seluruh isi formulir ini tanpa paksaan dari pihak mana pun.
+                  </li>
+                </ol>
               </div>
             </CardContent>
             <CardFooter className="p-5 sm:p-8 pt-4 sm:pt-6 flex flex-col gap-3">
